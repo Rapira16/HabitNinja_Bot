@@ -17,6 +17,8 @@ bot = telebot.TeleBot("8094395413:AAGlIanHK3Ji99-N90Nkinvqk4ikRJlkeQg")
 
 # region Database Functions
 def init_db():
+    # Устанавливаем соединение с базой данных 'habits.db'.
+    # Если файл базы данных не существует, он будет создан.
     conn = sqlite3.connect('habits.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS users
