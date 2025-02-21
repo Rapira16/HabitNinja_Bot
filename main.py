@@ -204,4 +204,8 @@ def update_habit_name(habit_id, new_name):
 
     # Создаем объект курсора для выполнения SQL-запросов.
     c = conn.cursor()
+
+    # Выполняем SQL-запрос для обновления названия привычки в таблице 'habits'.
+    # Устанавливаем новое значение habit_name для записи, где id соответствует переданному habit_id.
+    c.execute("UPDATE habits SET habit_name=? WHERE id=?", (new_name, habit_id))
 #endregion
