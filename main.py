@@ -190,4 +190,10 @@ def delete_habit(habit_id):
     # Выполняем SQL-запрос для удаления привычки из таблицы 'habits'.
     # Удаляем запись, где id соответствует переданному habit_id.
     c.execute("DELETE FROM habits WHERE id=?", (habit_id,))
+
+    # Сохраняем изменения в базе данных.
+    conn.commit()
+
+    # Закрываем соединение с базой данных.
+    conn.close()
 #endregion
