@@ -186,4 +186,8 @@ def delete_habit(habit_id):
 
     # Создаем объект курсора для выполнения SQL-запросов.
     c = conn.cursor()
+
+    # Выполняем SQL-запрос для удаления привычки из таблицы 'habits'.
+    # Удаляем запись, где id соответствует переданному habit_id.
+    c.execute("DELETE FROM habits WHERE id=?", (habit_id,))
 #endregion
