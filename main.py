@@ -59,7 +59,11 @@ def init_db():
                   user_id INTEGER,
                   habit_id INTEGER,
                   reminder_time TEXT)''')
+
+    # Сохраняем изменения в базе данных.
     conn.commit()
+
+    # Закрываем соединение с базой данных.
     conn.close()
 
 
