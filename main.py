@@ -20,6 +20,8 @@ def init_db():
     # Устанавливаем соединение с базой данных 'habits.db'.
     # Если файл базы данных не существует, он будет создан.
     conn = sqlite3.connect('habits.db')
+
+    # Создаем объект курсора для выполнения SQL-запросов.
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS users
                  (user_id INTEGER PRIMARY KEY, name TEXT, motivation_time TEXT)''')
