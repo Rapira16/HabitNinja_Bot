@@ -208,4 +208,10 @@ def update_habit_name(habit_id, new_name):
     # Выполняем SQL-запрос для обновления названия привычки в таблице 'habits'.
     # Устанавливаем новое значение habit_name для записи, где id соответствует переданному habit_id.
     c.execute("UPDATE habits SET habit_name=? WHERE id=?", (new_name, habit_id))
+
+    # Сохраняем изменения в базе данных.
+    conn.commit()
+
+    # Закрываем соединение с базой данных.
+    conn.close()
 #endregion
