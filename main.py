@@ -147,4 +147,7 @@ def update_habit_count(habit_id):
     # Создаем объект курсора для выполнения SQL-запросов.
     c = conn.cursor()
 
+    # Выполняем SQL-запрос для обновления счетчика привычки.
+    # Увеличиваем значение поля 'count' на 1 для привычки с указанным habit_id.
+    c.execute("UPDATE habits SET count = count + 1 WHERE id=?", (habit_id, ))
 #endregion
