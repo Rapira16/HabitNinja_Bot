@@ -158,4 +158,6 @@ def update_habit_count(habit_id):
     conn.close()
 
 
+def get_stats(user_id):
+
 #endregion
