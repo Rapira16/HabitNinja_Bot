@@ -179,4 +179,21 @@ def get_stats(user_id):
     # Возвращаем список статистики привычек пользователя.
     return stats
 
+
+def delete_habit(habit_id):
+    # Устанавливаем соединение с базой данных 'habits.db'.
+    conn = sqlite3.connect('habits.db')
+
+    # Создаем объект курсора для выполнения SQL-запросов.
+    c = conn.cursor()
+
+    # Выполняем SQL-запрос для удаления привычки из таблицы 'habits'.
+    # Удаляем запись, где id соответствует переданному habit_id.
+    c.execute("DELETE FROM habits WHERE id=?", (habit_id,))
+
+    # Сохраняем изменения в базе данных.
+    conn.commit()
+
+    # Закрываем соединение с базой данных.
+    conn.close()
 #endregion
