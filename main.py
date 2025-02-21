@@ -23,6 +23,12 @@ def init_db():
 
     # Создаем объект курсора для выполнения SQL-запросов.
     c = conn.cursor()
+
+    # Создаем таблицу 'users', если она еще не существует.
+    # Таблица содержит следующие поля:
+    # - user_id: уникальный идентификатор пользователя (первичный ключ)
+    # - name: имя пользователя
+    # - motivation_time: время, когда пользователь получает мотивацию
     c.execute('''CREATE TABLE IF NOT EXISTS users
                  (user_id INTEGER PRIMARY KEY, name TEXT, motivation_time TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS habits
