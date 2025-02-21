@@ -89,5 +89,7 @@ def add_user(user_id, name, motivation_time=None):
 
 
 def get_user_habits(user_id):
+    # Устанавливаем соединение с базой данных 'habits.db'.
+    conn = sqlite3.connect('habits.db')
 
 #endregion
