@@ -15,6 +15,7 @@ from telebot.types import (
 
 bot = telebot.TeleBot("8094395413:AAGlIanHK3Ji99-N90Nkinvqk4ikRJlkeQg")
 
+
 # region Database Functions
 def init_db():
     # Устанавливаем соединение с базой данных 'habits.db'.
@@ -39,7 +40,8 @@ def init_db():
     # - habit_name: название привычки
     # - created_date: дата создания привычки
     # - count: количество выполнений привычки (по умолчанию 0)
-    # Уникальное ограничение на сочетание user_id и habit_name, чтобы избежать дублирования привычек для одного пользователя.
+    # Уникальное ограничение на сочетание user_id и habit_name, чтобы избежать дублирования привычек
+    # для одного пользователя.
     c.execute('''CREATE TABLE IF NOT EXISTS habits
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id INTEGER,
@@ -87,7 +89,7 @@ def add_user(user_id, name, motivation_time=None):
     # Закрываем соединение с базой данных.
     conn.close()
 
-    
+
 def add_habit(user_id, habit_name):
     # Устанавливаем соединение с базой данных 'habits.db'.
     conn = sqlite3.connect('habits.db')
@@ -127,7 +129,7 @@ def get_user_habits(user_id):
 
     # Выполняем SQL-запрос для получения всех привычек пользователя по его user_id.
     # Запрос выбирает id и habit_name из таблицы 'habits', где user_id соответствует переданному значению.
-    c.execute("SELECT id, habit_name FROM habits WHERE user_id=?", (user_id))
+    c.execute("SELECT id, habit_name FROM habits WHERE user_id=?", (user_id, ))
 
     # Извлекаем все результаты запроса и сохраняем их в переменной habits.
     # Результат будет списком кортежей, где каждый кортеж представляет одну привычку.
@@ -149,7 +151,7 @@ def update_habit_count(habit_id):
 
     # Выполняем SQL-запрос для обновления счетчика привычки.
     # Увеличиваем значение поля 'count' на 1 для привычки с указанным habit_id.
-    c.execute("UPDATE habits SET count = count + 1 WHERE id=?", (habit_id, ))
+    c.execute("UPDATE habits SET count = count + 1 WHERE id=?", (habit_id,))
 
     # Сохраняем изменения в базе данных.
     conn.commit()
@@ -214,4 +216,4 @@ def update_habit_name(habit_id, new_name):
 
     # Закрываем соединение с базой данных.
     conn.close()
-#endregion
+# endregion
