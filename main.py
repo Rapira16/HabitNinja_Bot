@@ -87,4 +87,7 @@ def add_user(user_id, name, motivation_time=None):
     # Закрываем соединение с базой данных.
     conn.close()
 
+
+def get_user_habits(user_id):
+
 #endregion
