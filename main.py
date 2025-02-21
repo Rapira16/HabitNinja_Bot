@@ -196,4 +196,22 @@ def delete_habit(habit_id):
 
     # Закрываем соединение с базой данных.
     conn.close()
+
+
+def update_habit_name(habit_id, new_name):
+    # Устанавливаем соединение с базой данных 'habits.db'.
+    conn = sqlite3.connect('habits.db')
+
+    # Создаем объект курсора для выполнения SQL-запросов.
+    c = conn.cursor()
+
+    # Выполняем SQL-запрос для обновления названия привычки в таблице 'habits'.
+    # Устанавливаем новое значение habit_name для записи, где id соответствует переданному habit_id.
+    c.execute("UPDATE habits SET habit_name=? WHERE id=?", (new_name, habit_id))
+
+    # Сохраняем изменения в базе данных.
+    conn.commit()
+
+    # Закрываем соединение с базой данных.
+    conn.close()
 #endregion
