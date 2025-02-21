@@ -87,14 +87,8 @@ def add_user(user_id, name, motivation_time=None):
     # Закрываем соединение с базой данных.
     conn.close()
 
-
+    
 def add_habit(user_id, habit_name):
-    # Устанавливаем соединение с базой данных 'habits.db'.
-    conn = sqlite3.connect('habits.db')
-
-    # Создаем объект курсора для выполнения SQL-запросов.
-    c = conn.cursor()
-
     # Получаем текущую дату и время в формате "YYYY-MM-DD HH:MM:SS".
     created_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -116,5 +110,28 @@ def add_habit(user_id, habit_name):
     finally:
         # Закрываем соединение с базой данных в любом случае (успех или ошибка).
         conn.close()
+
+
+def get_user_habits(user_id):
+  # Устанавливаем соединение с базой данных 'habits.db'.
+    conn = sqlite3.connect('habits.db')
+
+    # Создаем объект курсора для выполнения SQL-запросов.
+    c = conn.cursor()
+
+    # Выполняем SQL-запрос для получения всех привычек пользователя по его user_id.
+    # Запрос выбирает id и habit_name из таблицы 'habits', где user_id соответствует переданному значению.
+    c.execute("SELECT id, habit_name FROM habits WHERE user_id=?", (user_id))
+
+    # Извлекаем все результаты запроса и сохраняем их в переменной habits.
+    # Результат будет списком кортежей, где каждый кортеж представляет одну привычку.
+    habits = c.fetchall()
+
+    # Закрываем соединение с базой данных.
+    conn.close()
+
+    # Возвращаем список привычек пользователя.
+    return habits
+
 
 #endregion
