@@ -143,4 +143,8 @@ def get_user_habits(user_id):
 def update_habit_count(habit_id):
     # Устанавливаем соединение с базой данных 'habits.db'.
     conn = sqlite3.connect('habits.db')
+
+    # Создаем объект курсора для выполнения SQL-запросов.
+    c = conn.cursor()
+
 #endregion
