@@ -169,4 +169,8 @@ def get_stats(user_id):
     # Запрос выбирает habit_name и count из таблицы 'habits', где user_id соответствует переданному значению.
     c.execute("SELECT habit_name, count FROM habits WHERE user_id=?", (user_id,))
 
+    # Извлекаем все результаты запроса и сохраняем их в переменной stats.
+    # Результат будет списком кортежей, где каждый кортеж содержит название привычки и ее счетчик.
+    stats = c.fetchall()
+
 #endregion
