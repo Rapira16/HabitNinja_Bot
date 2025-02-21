@@ -181,5 +181,6 @@ def get_stats(user_id):
 
 
 def delete_habit(habit_id):
-
+    # Устанавливаем соединение с базой данных 'habits.db'.
+    conn = sqlite3.connect('habits.db')
 #endregion
