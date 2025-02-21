@@ -179,4 +179,7 @@ def get_stats(user_id):
     # Возвращаем список статистики привычек пользователя.
     return stats
 
+
+def delete_habit(habit_id):
+
 #endregion
