@@ -31,6 +31,15 @@ def init_db():
     # - motivation_time: время, когда пользователь получает мотивацию
     c.execute('''CREATE TABLE IF NOT EXISTS users
                  (user_id INTEGER PRIMARY KEY, name TEXT, motivation_time TEXT)''')
+
+    # Создаем таблицу 'habits', если она еще не существует.
+    # Таблица содержит следующие поля:
+    # - id: уникальный идентификатор привычки (первичный ключ, автоинкремент)
+    # - user_id: идентификатор пользователя, которому принадлежит привычка
+    # - habit_name: название привычки
+    # - created_date: дата создания привычки
+    # - count: количество выполнений привычки (по умолчанию 0)
+    # Уникальное ограничение на сочетание user_id и habit_name, чтобы избежать дублирования привычек для одного пользователя.
     c.execute('''CREATE TABLE IF NOT EXISTS habits
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id INTEGER,
