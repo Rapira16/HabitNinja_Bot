@@ -99,4 +99,8 @@ def get_user_habits(user_id):
     # Запрос выбирает id и habit_name из таблицы 'habits', где user_id соответствует переданному значению.
     c.execute("SELECT id, habit_name FROM habits WHERE user_id=?", (user_id))
 
+    # Извлекаем все результаты запроса и сохраняем их в переменной habits.
+    # Результат будет списком кортежей, где каждый кортеж представляет одну привычку.
+    habits = c.fetchall()
+
 #endregion
