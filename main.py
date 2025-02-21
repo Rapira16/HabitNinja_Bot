@@ -92,4 +92,6 @@ def add_habit(user_id, habit_name):
     # Устанавливаем соединение с базой данных 'habits.db'.
     conn = sqlite3.connect('habits.db')
 
+
+
 #endregion
