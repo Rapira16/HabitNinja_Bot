@@ -150,4 +150,12 @@ def update_habit_count(habit_id):
     # Выполняем SQL-запрос для обновления счетчика привычки.
     # Увеличиваем значение поля 'count' на 1 для привычки с указанным habit_id.
     c.execute("UPDATE habits SET count = count + 1 WHERE id=?", (habit_id, ))
+
+    # Сохраняем изменения в базе данных.
+    conn.commit()
+
+    # Закрываем соединение с базой данных.
+    conn.close()
+
+
 #endregion
