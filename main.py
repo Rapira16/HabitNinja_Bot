@@ -89,6 +89,12 @@ def add_user(user_id, name, motivation_time=None):
 
     
 def add_habit(user_id, habit_name):
+    # Устанавливаем соединение с базой данных 'habits.db'.
+    conn = sqlite3.connect('habits.db')
+
+    # Создаем объект курсора для выполнения SQL-запросов.
+    c = conn.cursor()
+
     # Получаем текущую дату и время в формате "YYYY-MM-DD HH:MM:SS".
     created_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -113,7 +119,7 @@ def add_habit(user_id, habit_name):
 
 
 def get_user_habits(user_id):
-  # Устанавливаем соединение с базой данных 'habits.db'.
+    # Устанавливаем соединение с базой данных 'habits.db'.
     conn = sqlite3.connect('habits.db')
 
     # Создаем объект курсора для выполнения SQL-запросов.
@@ -134,4 +140,7 @@ def get_user_habits(user_id):
     return habits
 
 
+def update_habit_count(habit_id):
+    # Устанавливаем соединение с базой данных 'habits.db'.
+    conn = sqlite3.connect('habits.db')
 #endregion
