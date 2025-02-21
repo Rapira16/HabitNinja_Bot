@@ -158,4 +158,25 @@ def update_habit_count(habit_id):
     conn.close()
 
 
+def get_stats(user_id):
+    # Устанавливаем соединение с базой данных 'habits.db'.
+    conn = sqlite3.connect('habits.db')
+
+    # Создаем объект курсора для выполнения SQL-запросов.
+    c = conn.cursor()
+
+    # Выполняем SQL-запрос для получения статистики привычек пользователя по его user_id.
+    # Запрос выбирает habit_name и count из таблицы 'habits', где user_id соответствует переданному значению.
+    c.execute("SELECT habit_name, count FROM habits WHERE user_id=?", (user_id,))
+
+    # Извлекаем все результаты запроса и сохраняем их в переменной stats.
+    # Результат будет списком кортежей, где каждый кортеж содержит название привычки и ее счетчик.
+    stats = c.fetchall()
+
+    # Закрываем соединение с базой данных.
+    conn.close()
+
+    # Возвращаем список статистики привычек пользователя.
+    return stats
+
 #endregion
