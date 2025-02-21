@@ -89,6 +89,12 @@ def add_user(user_id, name, motivation_time=None):
 
     
 def add_habit(user_id, habit_name):
+    # Устанавливаем соединение с базой данных 'habits.db'.
+    conn = sqlite3.connect('habits.db')
+
+    # Создаем объект курсора для выполнения SQL-запросов.
+    c = conn.cursor()
+
     # Получаем текущую дату и время в формате "YYYY-MM-DD HH:MM:SS".
     created_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -113,7 +119,7 @@ def add_habit(user_id, habit_name):
 
 
 def get_user_habits(user_id):
-  # Устанавливаем соединение с базой данных 'habits.db'.
+    # Устанавливаем соединение с базой данных 'habits.db'.
     conn = sqlite3.connect('habits.db')
 
     # Создаем объект курсора для выполнения SQL-запросов.
@@ -132,6 +138,24 @@ def get_user_habits(user_id):
 
     # Возвращаем список привычек пользователя.
     return habits
+
+
+def update_habit_count(habit_id):
+    # Устанавливаем соединение с базой данных 'habits.db'.
+    conn = sqlite3.connect('habits.db')
+
+    # Создаем объект курсора для выполнения SQL-запросов.
+    c = conn.cursor()
+
+    # Выполняем SQL-запрос для обновления счетчика привычки.
+    # Увеличиваем значение поля 'count' на 1 для привычки с указанным habit_id.
+    c.execute("UPDATE habits SET count = count + 1 WHERE id=?", (habit_id, ))
+
+    # Сохраняем изменения в базе данных.
+    conn.commit()
+
+    # Закрываем соединение с базой данных.
+    conn.close()
 
 
 #endregion
