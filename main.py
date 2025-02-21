@@ -98,4 +98,10 @@ def add_habit(user_id, habit_name):
     # Получаем текущую дату и время в формате "YYYY-MM-DD HH:MM:SS".
     created_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    try:
+        # Выполняем SQL-запрос для добавления новой привычки в таблицу 'habits'.
+        # Параметры передаются через кортеж, чтобы избежать SQL-инъекций.
+        c.execute("INSERT INTO habits (user_id, habit_name, created_date) VALUES (?, ?, ?)",
+                  (user_id, habit_name, created_date))
+
 #endregion
