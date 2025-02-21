@@ -47,6 +47,13 @@ def init_db():
                   created_date TEXT,
                   count INTEGER DEFAULT 0,
                   UNIQUE(user_id, habit_name))''')
+
+    # Создаем таблицу 'reminders', если она еще не существует.
+    # Таблица содержит следующие поля:
+    # - id: уникальный идентификатор напоминания (первичный ключ, автоинкремент)
+    # - user_id: идентификатор пользователя, которому принадлежит напоминание
+    # - habit_id: идентификатор привычки, для которой установлено напоминание
+    # - reminder_time: время, когда должно быть отправлено напоминание
     c.execute('''CREATE TABLE IF NOT EXISTS reminders
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id INTEGER,
