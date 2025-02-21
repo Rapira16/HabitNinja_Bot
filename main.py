@@ -67,4 +67,6 @@ def init_db():
     conn.close()
 
 
+def add_user(user_id, name, motivation_time=None):
+
 #endregion
