@@ -74,4 +74,10 @@ def add_user(user_id, name, motivation_time=None):
     # Создаем объект курсора для выполнения SQL-запросов.
     c = conn.cursor()
 
+    # Выполняем SQL-запрос для добавления нового пользователя в таблицу 'users'.
+    # Используем 'INSERT OR IGNORE', чтобы избежать добавления дубликатов
+    # (если пользователь с таким user_id уже существует, запрос не выполнится).
+    # Параметры передаются через кортеж, чтобы избежать SQL-инъекций.
+    c.execute("INSERT OR IGNORE INTO users (user_id, name, motivation_time) VALUES (?, ?, ?)", (user_id, name, motivation_time))
+
 #endregion
