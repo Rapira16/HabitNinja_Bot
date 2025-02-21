@@ -201,4 +201,7 @@ def delete_habit(habit_id):
 def update_habit_name(habit_id, new_name):
     # Устанавливаем соединение с базой данных 'habits.db'.
     conn = sqlite3.connect('habits.db')
+
+    # Создаем объект курсора для выполнения SQL-запросов.
+    c = conn.cursor()
 #endregion
