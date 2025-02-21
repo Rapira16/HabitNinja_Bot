@@ -95,4 +95,7 @@ def add_habit(user_id, habit_name):
     # Создаем объект курсора для выполнения SQL-запросов.
     conn.cursor()
 
+    # Получаем текущую дату и время в формате "YYYY-MM-DD HH:MM:SS".
+    created_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 #endregion
