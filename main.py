@@ -93,7 +93,7 @@ def add_habit(user_id, habit_name):
     conn = sqlite3.connect('habits.db')
 
     # Создаем объект курсора для выполнения SQL-запросов.
-    conn.cursor()
+    c = conn.cursor()
 
     # Получаем текущую дату и время в формате "YYYY-MM-DD HH:MM:SS".
     created_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -109,6 +109,9 @@ def add_habit(user_id, habit_name):
 
         # Возвращаем True, если добавление прошло успешно.
         return True
-    except:
+    except sqlite3.IntegrityError:
+        # Если возникла ошибка целостности (например, дублирование уникального значения),
+        # возвращаем False.
+        return False
 
 #endregion
