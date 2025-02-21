@@ -159,5 +159,7 @@ def update_habit_count(habit_id):
 
 
 def get_stats(user_id):
+    # Устанавливаем соединение с базой данных 'habits.db'.
+    conn = sqlite3.connect('habits.db')
 
 #endregion
