@@ -104,4 +104,11 @@ def add_habit(user_id, habit_name):
         c.execute("INSERT INTO habits (user_id, habit_name, created_date) VALUES (?, ?, ?)",
                   (user_id, habit_name, created_date))
 
+        # Сохраняем изменения в базе данных.
+        conn.commit()
+
+        # Возвращаем True, если добавление прошло успешно.
+        return True
+    except:
+
 #endregion
