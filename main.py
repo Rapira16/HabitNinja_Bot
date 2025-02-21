@@ -196,4 +196,7 @@ def delete_habit(habit_id):
 
     # Закрываем соединение с базой данных.
     conn.close()
+
+
+def update_habit_name(habit_id, new_name):
 #endregion
