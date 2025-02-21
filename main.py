@@ -67,4 +67,8 @@ def init_db():
     conn.close()
 
 
+def add_user(user_id, name, motivation_time=None):
+    # Устанавливаем соединение с базой данных 'habits.db'.
+    conn = sqlite3.connect('habits.db')
+
 #endregion
