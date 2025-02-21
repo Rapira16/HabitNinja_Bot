@@ -165,4 +165,8 @@ def get_stats(user_id):
     # Создаем объект курсора для выполнения SQL-запросов.
     c = conn.cursor()
 
+    # Выполняем SQL-запрос для получения статистики привычек пользователя по его user_id.
+    # Запрос выбирает habit_name и count из таблицы 'habits', где user_id соответствует переданному значению.
+    c.execute("SELECT habit_name, count FROM habits WHERE user_id=?", (user_id,))
+
 #endregion
