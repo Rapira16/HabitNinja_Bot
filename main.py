@@ -95,4 +95,8 @@ def get_user_habits(user_id):
     # Создаем объект курсора для выполнения SQL-запросов.
     c = conn.cursor()
 
+    # Выполняем SQL-запрос для получения всех привычек пользователя по его user_id.
+    # Запрос выбирает id и habit_name из таблицы 'habits', где user_id соответствует переданному значению.
+    c.execute("SELECT id, habit_name FROM habits WHERE user_id=?", (user_id))
+
 #endregion
