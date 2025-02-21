@@ -71,4 +71,20 @@ def add_user(user_id, name, motivation_time=None):
     # Устанавливаем соединение с базой данных 'habits.db'.
     conn = sqlite3.connect('habits.db')
 
+    # Создаем объект курсора для выполнения SQL-запросов.
+    c = conn.cursor()
+
+    # Выполняем SQL-запрос для добавления нового пользователя в таблицу 'users'.
+    # Используем 'INSERT OR IGNORE', чтобы избежать добавления дубликатов
+    # (если пользователь с таким user_id уже существует, запрос не выполнится).
+    # Параметры передаются через кортеж, чтобы избежать SQL-инъекций.
+    c.execute("INSERT OR IGNORE INTO users (user_id, name, motivation_time) VALUES (?, ?, ?)",
+              (user_id, name, motivation_time))
+
+    # Сохраняем изменения в базе данных.
+    conn.commit()
+
+    # Закрываем соединение с базой данных.
+    conn.close()
+
 #endregion
