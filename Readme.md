@@ -27,3 +27,9 @@ Habit Tracker Bot — это Telegram-бот, который помогает п
    ```bash
    git clone https://github.com/yourusername/habit-tracker-bot.git
    cd habit-tracker-bot
+   ```
+
+2. Установите зависимости:
+   ```bash
+   pip install -r requirements.txt
+   ```
