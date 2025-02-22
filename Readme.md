@@ -1,6 +1,10 @@
-# Habit Tracker Bot
+<p align="center">
+  <h1>Habit Tracker Bot</h1>
+</p>
 
-![Habit Tracker Bot](https://example.com/habit-tracker-bot-image.png) <!-- Замените на ссылку на изображение вашего бота -->
+<p align="center">
+  <img src="https://github.com/Rapira16/HabitNinja_Bot/blob/main/photo_2025-02-21_11-45-48.jpg?raw=true" alt="Habit Tracker Bot" />
+</p>
 
 ## Описание
 
