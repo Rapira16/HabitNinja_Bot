@@ -288,6 +288,8 @@ def track_habit(message):
         ))
     keyboard.add(InlineKeyboardButton("Back"))
 
+    bot.send_message(message.chat.id, "Choose", reply_markup=keyboard)
+
 # endregion
 
 if __name__ == "__main__":
