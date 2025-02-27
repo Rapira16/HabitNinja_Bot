@@ -217,6 +217,13 @@ def start(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_text(message):
+    """
+    Обрабатывает текстовые сообщения от пользователя и вызывает соответствующие функции
+    в зависимости от текста сообщения.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
+    """
     if message.text == "Добавить привычку ➕":
         add_habit_start(message)
     elif message.text == "Отметить выполнение ✅":
@@ -232,9 +239,17 @@ def handle_text(message):
     elif message.text == "Установить мотивационное сообщение ⏰":
         set_motivation_start(message)
     elif message.text == "Назад":
-        bot.send_message(message.chat.id, "Команда отменена.", reply_markup=create_menu())
+        bot.send_message(
+            message.chat.id,
+            "Команда отменена.",
+            reply_markup=create_menu()
+        )
     else:
-        bot.send_message(message.chat.id, "⚠️ Используй кнопки ниже ⬇️", reply_markup=create_menu())
+        bot.send_message(
+            message.chat.id,
+            "⚠️ Используй кнопки ниже ⬇️",
+            reply_markup=create_menu()
+        )
 
 # region Habit Management
 @bot.message_handler(commands=['add_habit'])
