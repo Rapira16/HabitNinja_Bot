@@ -181,6 +181,13 @@ def update_habit_name(habit_id, new_name):
 
 # region Menu & Handlers
 def create_menu():
+    """
+    Создает и возвращает меню с кнопками для взаимодействия с пользователем.
+
+    Returns:
+        ReplyKeyboardMarkup: Меню с кнопками для добавления, редактирования, удаления привычек,
+        отметки выполнения, просмотра статистики, установки напоминаний и мотивационных сообщений.
+    """
     menu = ReplyKeyboardMarkup(resize_keyboard=True)
     menu.add(KeyboardButton("Добавить привычку ➕"))
     menu.add(KeyboardButton("Отметить выполнение ✅"))
