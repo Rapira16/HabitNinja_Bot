@@ -469,7 +469,7 @@ def edit_habit_start(message):
     habits = get_user_habits(user_id)
 
     if not habits:
-        bot.send_message(message.chat.id, "Error", reply_markup=create_menu())
+        bot.send_message(message.chat.id, "❌ У вас нет добавленных привычек.", reply_markup=create_menu())
         return
 
     keyboard = InlineKeyboardMarkup()
@@ -478,9 +478,9 @@ def edit_habit_start(message):
         keyboard.add(InlineKeyboardButton(
             text=f"✏️ {habit_name}"
         ))
-    keyboard.add(InlineKeyboardButton("Back", callback_data="back_to_menu"))
+    keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
-    bot.send_message(message.chat.id, "Choose", reply_markup=keyboard)
+    bot.send_message(message.chat.id, "✏️ Выберите привычку для редактирования:", reply_markup=keyboard)
 
 
 # endregion
