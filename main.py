@@ -344,17 +344,34 @@ def track_habit_complete(call):
 
 @bot.message_handler(commands=['stats'])
 def show_stats(message):
+    """
+    Отображает статистику выполнения привычек пользователя.
+
+    Если статистика отсутствует, отправляет сообщение об этом.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
+    """
     user_id = message.from_user.id
     stats = get_stats(user_id)
 
     if not stats:
-        bot.send_message(message.chat.id, "📊 Статистика пока пуста.", reply_markup=create_menu())
+        bot.send_message(
+            message.chat.id,
+            "📊 Статистика пока пуста.",
+            reply_markup=create_menu()
+        )
         return
 
     message_text = "📊 Ваша статистика:\n\n" + "\n".join(
         [f"• {habit[0]}: {habit[1]} раз" for habit in stats]
     )
-    bot.send_message(message.chat.id, message_text, reply_markup=create_menu())
+
+    bot.send_message(
+        message.chat.id,
+        message_text,
+        reply_markup=create_menu()
+    )
 
 # endregion
 
