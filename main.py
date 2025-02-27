@@ -472,6 +472,14 @@ def edit_habit_start(message):
         bot.send_message(message.chat.id, "Error", reply_markup=create_menu())
         return
 
+    keyboard = InlineKeyboardMarkup()
+    for habit in habits:
+        habit_id, habit_name = habit
+        keyboard.add(InlineKeyboardButton(
+            text=f"✏️ {habit_name}"
+        ))
+    keyboard.add(InlineKeyboardButton("Back", callback_data="back_to_menu"))
+
 
 # endregion
 
