@@ -270,3 +270,8 @@ def add_habit_end(message):
         )
 
 # endregion
+
+if __name__ == "__main__":
+    init_db()
+    print("🚀 Бот успешно запущен!")
+    bot.polling(none_stop=True)
