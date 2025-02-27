@@ -223,7 +223,7 @@ def handle_text(message):
 # region Habit Management
 @bot.message_handler(commands=['add_habit'])
 def add_habit_start(message):
-    msg = bot.send_message(message.chat.id, "New", reply_markup=ReplyKeyboardRemove())
+    msg = bot.send_message(message.chat.id, "➕ Введите название новой привычки:", reply_markup=ReplyKeyboardRemove())
     bot.register_next_step_handler(msg, add_habit_end)
 
 def add_habit_end(message):
@@ -231,12 +231,12 @@ def add_habit_end(message):
     habit_name = message.text.strip()
 
     if len(habit_name) < 2:
-        bot.send_message(message.chat.id, "Short name", reply_markup=create_menu())
+        bot.send_message(message.chat.id, "❌ Название должно быть не короче 2 символов!", reply_markup=create_menu())
         return
 
     if add_habit(user_id, habit_name):
-        bot.send_message(message.chat.id, "True", reply_markup=create_menu())
+        bot.send_message(message.chat.id, f"✅ Привычка '{habit_name}' успешно добавлена!", reply_markup=create_menu())
     else:
-        bot.send_message(message.chat.id, "False", reply_markup=create_menu())
+        bot.send_message(message.chat.id, f"❌ Привычка '{habit_name}' уже существует!", reply_markup=create_menu())
 
 # endregion
