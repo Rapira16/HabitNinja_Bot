@@ -462,6 +462,12 @@ def delete_habit_complete(call):
         reply_markup=create_menu()
     )
 
+# region Edit Habit
+@bot.message_handler(commands=['edit_habit'])
+def edit_habit_start(message):
+    user_id = message.from_user.id
+    habits = get_user_habits(user_id)
+
 # endregion
 
 # region Back to Menu
