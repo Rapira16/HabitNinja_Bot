@@ -187,6 +187,8 @@ def create_menu():
     menu.add(KeyboardButton("Статистика"))
     menu.add(KeyboardButton("Удалить привычку"))
     menu.add(KeyboardButton("Редактировать привычку"))
+    menu.add(KeyboardButton("Установить напоминание"))
+    menu.add(KeyboardButton("Установить мотивационное сообщение"))
     return menu
 
 # endregion
