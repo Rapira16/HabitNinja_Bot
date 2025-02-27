@@ -295,6 +295,14 @@ def track_habit(message):
 def track_habit_complete(call):
     habit_id = call.data.split("_")[1]
 
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+    c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
+    habit_name = c.fetchone()[0]
+    conn.close()
+
+    update_habit_count(habit_id)
+
 # endregion
 
 # region Back to Menu
