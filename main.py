@@ -405,7 +405,7 @@ def delete_habit_start(message):
     habits = get_user_habits(user_id)
 
     if not habits:
-        bot.send_message(message.chat.id, "Error", reply_markup=create_menu())
+        bot.send_message(message.chat.id, "❌ У вас нет добавленных привычек.", reply_markup=create_menu())
         return
 
     keyboard = InlineKeyboardMarkup()
@@ -417,7 +417,7 @@ def delete_habit_start(message):
         ))
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
-    bot.send_message(message.chat.id, "Choose", reply_markup=keyboard)
+    bot.send_message(message.chat.id, "🗑️ Выберите привычку для удаления:", reply_markup=keyboard)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("delete_"))
 def delete_habit_complete(call):
