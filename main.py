@@ -223,6 +223,16 @@ def handle_text(message):
         track_habit(message)
     elif message.text == "Статистика 📊":
         show_stats(message)
+    elif message.text == "Удалить привычку ❌":
+        delete_habit_start(message)
+    elif message.text == "Редактировать привычку ✏️":
+        edit_habit_start(message)
+    elif message.text == "Установить напоминание ⏰":
+        set_reminder_start(message)
+    elif message.text == "Установить мотивационное сообщение ⏰":
+        set_motivation_start(message)
+    elif message.text == "Назад":
+        bot.send_message(message.chat.id, "Команда отменена.", reply_markup=create_menu())
     else:
         bot.send_message(message.chat.id, "⚠️ Используй кнопки ниже ⬇️", reply_markup=create_menu())
 
