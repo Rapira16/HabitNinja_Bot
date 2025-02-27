@@ -219,6 +219,8 @@ def start(message):
 def handle_text(message):
     if message.text == "Добавить привычку ➕":
         add_habit_start(message)
+    else:
+        bot.send_message(message.chat.id, "you wrong", reply_markup=create_menu())
 
 # region Habit Management
 @bot.message_handler(commands=['add_habit'])
