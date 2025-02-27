@@ -215,4 +215,9 @@ def start(message):
         reply_markup=create_menu()
     )
 
+@bot.message_handler(func=lambda message: True)
+def handle_text(message):
+    if message.text == "Добавить привычку ➕":
+        add_habit_start(message)
+
 # endregion
