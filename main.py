@@ -344,17 +344,14 @@ def track_habit_complete(call):
     """
     habit_id = call.data.split("_")[1]
 
-    # Подключение к базе данных и получение названия привычки
     conn = sqlite3.connect('habits.db')
     c = conn.cursor()
     c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
     habit_name = c.fetchone()[0]
     conn.close()
 
-    # Обновление счетчика привычки
     update_habit_count(habit_id)
 
-    # Ответ пользователю
     bot.answer_callback_query(call.id, f"✅ Привычка '{habit_name}' отмечена!")
     bot.edit_message_text(
         chat_id=call.message.chat.id,
@@ -395,6 +392,73 @@ def show_stats(message):
     bot.send_message(
         message.chat.id,
         message_text,
+        reply_markup=create_menu()
+    )
+
+# region Delete Habit
+@bot.message_handler(commands=['delete_habit'])
+def delete_habit_start(message):
+    """
+    Отображает список привычек пользователя для удаления.
+
+    Если у пользователя нет привычек, отправляет сообщение об этом.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
+    """
+    user_id = message.from_user.id
+    habits = get_user_habits(user_id)
+
+    if not habits:
+        bot.send_message(
+            message.chat.id,
+            "❌ У вас нет добавленных привычек.",
+            reply_markup=create_menu()
+        )
+        return
+
+    keyboard = InlineKeyboardMarkup()
+    for habit in habits:
+        habit_id, habit_name = habit
+        keyboard.add(InlineKeyboardButton(
+            text=f"❌ {habit_name}",
+            callback_data=f"delete_{habit_id}"
+        ))
+    keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
+
+    bot.send_message(
+        message.chat.id,
+        "🗑️ Выберите привычку для удаления:",
+        reply_markup=keyboard
+    )
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("delete_"))
+def delete_habit_complete(call):
+    """
+    Обрабатывает callback-запрос для удаления привычки.
+
+    Args:
+        call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    """
+    habit_id = call.data.split("_")[1]
+
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+    c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
+    habit_name = c.fetchone()[0]
+    conn.close()
+
+    delete_habit(habit_id)
+
+    bot.answer_callback_query(call.id, f"❌ Привычка '{habit_name}' удалена!")
+    bot.edit_message_text(
+        chat_id=call.message.chat.id,
+        message_id=call.message.message_id,
+        text=f"🗑️ Привычка '{habit_name}' успешно удалена!"
+    )
+    bot.send_message(
+        call.message.chat.id,
+        "🏠 Возвращаемся в главное меню:",
         reply_markup=create_menu()
     )
 
