@@ -201,5 +201,6 @@ def create_menu():
 @bot.message_handler(commands=['start'])
 def start(message):
     user = message.from_user
+    add_user(user.id, user.first_name)
 
 # endregion
