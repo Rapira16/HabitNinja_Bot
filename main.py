@@ -300,6 +300,7 @@ def back_to_menu(call):
         text="🏠 Возвращаемся в главное меню:",
         reply_markup=create_menu()
     )
+    bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
 
 # endregion
 
