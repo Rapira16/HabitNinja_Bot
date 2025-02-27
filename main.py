@@ -204,7 +204,8 @@ def start(message):
     add_user(user.id, user.first_name)
     bot.send_message(
         message.chat.id,
-        "Привет",
+        f"👋 Привет {user.first_name}! Я помогу тебе отслеживать привычки!\n\n"
+        "Используй кнопки ниже для управления:",
         reply_markup=create_menu()
     )
 
