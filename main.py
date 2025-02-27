@@ -465,11 +465,23 @@ def delete_habit_complete(call):
 # region Edit Habit
 @bot.message_handler(commands=['edit_habit'])
 def edit_habit_start(message):
+    """
+    Отображает список привычек пользователя для редактирования.
+
+    Если у пользователя нет привычек, отправляет сообщение об этом.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
+    """
     user_id = message.from_user.id
     habits = get_user_habits(user_id)
 
     if not habits:
-        bot.send_message(message.chat.id, "❌ У вас нет добавленных привычек.", reply_markup=create_menu())
+        bot.send_message(
+            message.chat.id,
+            "❌ У вас нет добавленных привычек.",
+            reply_markup=create_menu()
+        )
         return
 
     keyboard = InlineKeyboardMarkup()
@@ -481,7 +493,11 @@ def edit_habit_start(message):
         ))
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
-    bot.send_message(message.chat.id, "✏️ Выберите привычку для редактирования:", reply_markup=keyboard)
+    bot.send_message(
+        message.chat.id,
+        "✏️ Выберите привычку для редактирования:",
+        reply_markup=keyboard
+    )
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("edit_"))
 def edit_habit_complete(call):
