@@ -221,6 +221,8 @@ def handle_text(message):
         add_habit_start(message)
     elif message.text == "Отметить выполнение ✅":
         track_habit(message)
+    elif message.text == "Статистика 📊":
+        show_stats(message)
     else:
         bot.send_message(message.chat.id, "⚠️ Используй кнопки ниже ⬇️", reply_markup=create_menu())
 
