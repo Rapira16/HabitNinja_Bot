@@ -510,6 +510,10 @@ def edit_habit_complete(call):
     conn.close()
 
     msg = bot.send_message(call.message.chat.id, f"🔄 Введите новое название для привычки '{habit_name}':", reply_markup=ReplyKeyboardRemove())
+    bot.register_next_step_handler(msg, lambda message, h_id=habit_id: update_habit_end(message, h_id))
+
+def update_habit_end(message, habit_id):
+    new_name = message.text.strip()
 
 
 # endregion
