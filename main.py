@@ -348,11 +348,11 @@ def show_stats(message):
     stats = get_stats(user_id)
 
     if not stats:
-        bot.send_message(message.chat.id, "Error", reply_markup=create_menu())
+        bot.send_message(message.chat.id, "📊 Статистика пока пуста.", reply_markup=create_menu())
         return
 
-    message_text = "Stats:\n\n" + "\n".join(
-        [f"• {habit[0]}: {habit[1]}" for habit in stats]
+    message_text = "📊 Ваша статистика:\n\n" + "\n".join(
+        [f"• {habit[0]}: {habit[1]} раз" for habit in stats]
     )
     bot.send_message(message.chat.id, message_text, reply_markup=create_menu())
 
