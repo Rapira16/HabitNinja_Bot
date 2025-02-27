@@ -224,6 +224,10 @@ def handle_text(message):
 @bot.message_handler(commands=['add_habit'])
 def add_habit_start(message):
     msg = bot.send_message(message.chat.id, "New", reply_markup=ReplyKeyboardRemove())
+    bot.register_next_step_handler(msg, add_habit_end)
 
+def add_habit_end(message):
+    user_id = message.from_user.id
+    habit_name = message.text.strip()
 
 # endregion
