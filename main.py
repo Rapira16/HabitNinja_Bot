@@ -309,23 +309,36 @@ def track_habit(message):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("track_"))
 def track_habit_complete(call):
+    """
+    Обрабатывает callback-запрос для отметки выполнения привычки.
+
+    Args:
+        call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    """
     habit_id = call.data.split("_")[1]
 
+    # Подключение к базе данных и получение названия привычки
     conn = sqlite3.connect('habits.db')
     c = conn.cursor()
     c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
     habit_name = c.fetchone()[0]
     conn.close()
 
+    # Обновление счетчика привычки
     update_habit_count(habit_id)
 
+    # Ответ пользователю
     bot.answer_callback_query(call.id, f"✅ Привычка '{habit_name}' отмечена!")
     bot.edit_message_text(
         chat_id=call.message.chat.id,
         message_id=call.message.message_id,
         text=f"🎉 Привычка '{habit_name}' успешно отмечена!"
     )
-    bot.send_message(call.message.chat.id, "🏠 Возвращаемся в главное меню:", reply_markup=create_menu())
+    bot.send_message(
+        call.message.chat.id,
+        "🏠 Возвращаемся в главное меню:",
+        reply_markup=create_menu()
+    )
 
 # endregion
 
