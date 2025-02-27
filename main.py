@@ -519,6 +519,8 @@ def update_habit_end(message, habit_id):
         bot.send_message(message.chat.id, "Short", reply_markup=create_menu())
         return
 
+    update_habit_name(habit_id, new_name)
+    bot.send_message(message.chat.id, "Done", reply_markup=create_menu())
 
 # endregion
 
