@@ -204,7 +204,8 @@ def start(message):
     add_user(user.id, user.first_name)
     bot.send_message(
         message.chat.id,
-        "Привет"
+        "Привет",
+        reply_markup=create_menu()
     )
 
 # endregion
