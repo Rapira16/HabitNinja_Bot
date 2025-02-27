@@ -303,6 +303,14 @@ def track_habit_complete(call):
 
     update_habit_count(habit_id)
 
+    bot.answer_callback_query(call.id, "Done")
+    bot.edit_message_text(
+        chat_id=call.message.chat.id,
+        message_id=call.message.message_id,
+        text="Done"
+    )
+    bot.send_message(call.message.chat.id, "Back")
+
 # endregion
 
 # region Back to Menu
