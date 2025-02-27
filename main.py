@@ -416,6 +416,8 @@ def delete_habit_start(message):
         ))
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
+    bot.send_message(message.chat.id, "Choose", reply_markup=keyboard)
+
 
 # endregion
 
