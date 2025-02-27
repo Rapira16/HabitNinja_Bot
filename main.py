@@ -219,6 +219,8 @@ def start(message):
 def handle_text(message):
     if message.text == "Добавить привычку ➕":
         add_habit_start(message)
+    elif message.text == "Отметить выполнение ✅":
+        track_habit(message)
     else:
         bot.send_message(message.chat.id, "⚠️ Используй кнопки ниже ⬇️", reply_markup=create_menu())
 
@@ -268,6 +270,96 @@ def add_habit_end(message):
             f"❌ Привычка '{habit_name}' уже существует!",
             reply_markup=create_menu()
         )
+
+@bot.message_handler(commands=['track_habit'])
+def track_habit(message):
+    """
+    Отображает список привычек пользователя для отметки выполнения.
+
+    Если у пользователя нет привычек, отправляет сообщение об этом.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
+    """
+    user_id = message.from_user.id
+    habits = get_user_habits(user_id)
+
+    if not habits:
+        bot.send_message(
+            message.chat.id,
+            "❌ У вас нет добавленных привычек.",
+            reply_markup=create_menu()
+        )
+        return
+
+    keyboard = InlineKeyboardMarkup()
+    for habit in habits:
+        habit_id, habit_name = habit
+        keyboard.add(InlineKeyboardButton(
+            text=f"✅ {habit_name}",
+            callback_data=f"track_{habit_id}"
+        ))
+    keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
+
+    bot.send_message(
+        message.chat.id,
+        "📅 Выберите привычку для отметки:",
+        reply_markup=keyboard
+    )
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("track_"))
+def track_habit_complete(call):
+    """
+    Обрабатывает callback-запрос для отметки выполнения привычки.
+
+    Args:
+        call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    """
+    habit_id = call.data.split("_")[1]
+
+    # Подключение к базе данных и получение названия привычки
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+    c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
+    habit_name = c.fetchone()[0]
+    conn.close()
+
+    # Обновление счетчика привычки
+    update_habit_count(habit_id)
+
+    # Ответ пользователю
+    bot.answer_callback_query(call.id, f"✅ Привычка '{habit_name}' отмечена!")
+    bot.edit_message_text(
+        chat_id=call.message.chat.id,
+        message_id=call.message.message_id,
+        text=f"🎉 Привычка '{habit_name}' успешно отмечена!"
+    )
+    bot.send_message(
+        call.message.chat.id,
+        "🏠 Возвращаемся в главное меню:",
+        reply_markup=create_menu()
+    )
+
+# endregion
+
+# region Back to Menu
+@bot.callback_query_handler(func=lambda call: call.data == "back_to_menu")
+def back_to_menu(call):
+    """
+    Возвращает пользователя в главное меню, удаляя предыдущее сообщение.
+
+    Args:
+        call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    """
+    bot.send_message(
+        chat_id=call.message.chat.id,
+        text="🏠 Возвращаемся в главное меню:",
+        reply_markup=create_menu()
+    )
+    bot.delete_message(
+        chat_id=call.message.chat.id,
+        message_id=call.message.message_id
+    )
 
 # endregion
 
