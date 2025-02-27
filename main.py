@@ -476,11 +476,16 @@ def edit_habit_start(message):
     for habit in habits:
         habit_id, habit_name = habit
         keyboard.add(InlineKeyboardButton(
-            text=f"✏️ {habit_name}"
+            text=f"✏️ {habit_name}",
+            callback_data=f"edit_{habit_id}"
         ))
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
     bot.send_message(message.chat.id, "✏️ Выберите привычку для редактирования:", reply_markup=keyboard)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("edit_"))
+def edit_habit_complete(call):
+    habit_id = call.data.split("_")[1]
 
 
 # endregion
