@@ -182,6 +182,11 @@ def update_habit_name(habit_id, new_name):
 # region Menu & Handlers
 def create_menu():
     menu = ReplyKeyboardMarkup(resize_keyboard=True)
+    menu.add(KeyboardButton("Добавить привычку"))
+    menu.add(KeyboardButton("Отметить выполнение"))
+    menu.add(KeyboardButton("Статистика"))
+    menu.add(KeyboardButton("Удалить привычку"))
+    menu.add(KeyboardButton("Редактировать привычку"))
     return menu
 
 # endregion
