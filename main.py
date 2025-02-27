@@ -527,14 +527,32 @@ def edit_habit_complete(call):
     )
 
 def update_habit_end(message, habit_id):
+    """
+    Обновляет название привычки на основе введенного пользователем текста.
+
+    Если новое название короче 2 символов, отправляет сообщение об ошибке.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя с новым названием привычки.
+        habit_id (int): Идентификатор привычки, которую нужно обновить.
+    """
     new_name = message.text.strip()
 
     if len(new_name) < 2:
-        bot.send_message(message.chat.id, "❌ Название должно быть не короче 2 символов!", reply_markup=create_menu())
+        bot.send_message(
+            message.chat.id,
+            "❌ Название должно быть не короче 2 символов!",
+            reply_markup=create_menu()
+        )
         return
 
     update_habit_name(habit_id, new_name)
-    bot.send_message(message.chat.id, f"✅ Название привычки успешно обновлено на '{new_name}'!", reply_markup=create_menu())
+
+    bot.send_message(
+        message.chat.id,
+        f"✅ Название привычки успешно обновлено на '{new_name}'!",
+        reply_markup=create_menu()
+    )
 
 # endregion
 
