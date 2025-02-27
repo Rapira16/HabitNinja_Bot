@@ -198,4 +198,8 @@ def create_menu():
     menu.add(KeyboardButton("Установить мотивационное сообщение ⏰"))
     return menu
 
+@bot.message_handler(commands=['start'])
+def start(message):
+    user = message.from_user
+
 # endregion
