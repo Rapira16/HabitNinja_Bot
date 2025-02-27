@@ -398,6 +398,13 @@ def show_stats(message):
         reply_markup=create_menu()
     )
 
+# region Delete Habit
+@bot.message_handler(commands=['delete_habit'])
+def delete_habit_start(message):
+    user_id = message.from_user.id
+    habits = get_user_habits(user_id)
+
+
 # endregion
 
 # region Back to Menu
