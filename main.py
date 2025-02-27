@@ -273,11 +273,23 @@ def add_habit_end(message):
 
 @bot.message_handler(commands=['track_habit'])
 def track_habit(message):
+    """
+    Отображает список привычек пользователя для отметки выполнения.
+
+    Если у пользователя нет привычек, отправляет сообщение об этом.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
+    """
     user_id = message.from_user.id
     habits = get_user_habits(user_id)
 
     if not habits:
-        bot.send_message(message.chat.id, "❌ У вас нет добавленных привычек.", reply_markup=create_menu())
+        bot.send_message(
+            message.chat.id,
+            "❌ У вас нет добавленных привычек.",
+            reply_markup=create_menu()
+        )
         return
 
     keyboard = InlineKeyboardMarkup()
@@ -289,7 +301,11 @@ def track_habit(message):
         ))
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
-    bot.send_message(message.chat.id, "📅 Выберите привычку для отметки:", reply_markup=keyboard)
+    bot.send_message(
+        message.chat.id,
+        "📅 Выберите привычку для отметки:",
+        reply_markup=keyboard
+    )
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("track_"))
 def track_habit_complete(call):
