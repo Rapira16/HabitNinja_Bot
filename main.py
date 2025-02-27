@@ -437,6 +437,12 @@ def delete_habit_start(message):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("delete_"))
 def delete_habit_complete(call):
+    """
+    Обрабатывает callback-запрос для удаления привычки.
+
+    Args:
+        call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    """
     habit_id = call.data.split("_")[1]
 
     conn = sqlite3.connect('habits.db')
@@ -453,7 +459,11 @@ def delete_habit_complete(call):
         message_id=call.message.message_id,
         text=f"🗑️ Привычка '{habit_name}' успешно удалена!"
     )
-    bot.send_message(call.message.chat.id, "🏠 Возвращаемся в главное меню:", reply_markup=create_menu())
+    bot.send_message(
+        call.message.chat.id,
+        "🏠 Возвращаемся в главное меню:",
+        reply_markup=create_menu()
+    )
 
 # endregion
 
