@@ -468,6 +468,11 @@ def edit_habit_start(message):
     user_id = message.from_user.id
     habits = get_user_habits(user_id)
 
+    if not habits:
+        bot.send_message(message.chat.id, "Error", reply_markup=create_menu())
+        return
+
+
 # endregion
 
 # region Back to Menu
