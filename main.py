@@ -342,6 +342,11 @@ def track_habit_complete(call):
         reply_markup=create_menu()
     )
 
+@bot.message_handler(commands=['stats'])
+def show_stats(message):
+    user_id = message.from_user.id
+    stats = get_stats(user_id)
+
 # endregion
 
 # region Back to Menu
