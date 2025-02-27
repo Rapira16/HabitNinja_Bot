@@ -431,6 +431,14 @@ def delete_habit_complete(call):
 
     delete_habit(habit_id)
 
+    bot.answer_callback_query(call.id, "Done")
+    bot.edit_message_text(
+        chat_id=call.message.chat.id,
+        message_id=call.message.message_id,
+        text="Done"
+    )
+    bot.send_message(call.message.chat.id, "Back", reply_markup=create_menu())
+
 # endregion
 
 # region Back to Menu
