@@ -200,6 +200,12 @@ def create_menu():
 
 @bot.message_handler(commands=['start'])
 def start(message):
+    """
+    Обрабатывает команду /start. Приветствует пользователя и отправляет меню для управления привычками.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
+    """
     user = message.from_user
     add_user(user.id, user.first_name)
     bot.send_message(
