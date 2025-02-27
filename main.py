@@ -344,17 +344,14 @@ def track_habit_complete(call):
     """
     habit_id = call.data.split("_")[1]
 
-    # Подключение к базе данных и получение названия привычки
     conn = sqlite3.connect('habits.db')
     c = conn.cursor()
     c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
     habit_name = c.fetchone()[0]
     conn.close()
 
-    # Обновление счетчика привычки
     update_habit_count(habit_id)
 
-    # Ответ пользователю
     bot.answer_callback_query(call.id, f"✅ Привычка '{habit_name}' отмечена!")
     bot.edit_message_text(
         chat_id=call.message.chat.id,
