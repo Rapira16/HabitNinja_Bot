@@ -462,6 +462,98 @@ def delete_habit_complete(call):
         reply_markup=create_menu()
     )
 
+# region Edit Habit
+@bot.message_handler(commands=['edit_habit'])
+def edit_habit_start(message):
+    """
+    Отображает список привычек пользователя для редактирования.
+
+    Если у пользователя нет привычек, отправляет сообщение об этом.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
+    """
+    user_id = message.from_user.id
+    habits = get_user_habits(user_id)
+
+    if not habits:
+        bot.send_message(
+            message.chat.id,
+            "❌ У вас нет добавленных привычек.",
+            reply_markup=create_menu()
+        )
+        return
+
+    keyboard = InlineKeyboardMarkup()
+    for habit in habits:
+        habit_id, habit_name = habit
+        keyboard.add(InlineKeyboardButton(
+            text=f"✏️ {habit_name}",
+            callback_data=f"edit_{habit_id}"
+        ))
+    keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
+
+    bot.send_message(
+        message.chat.id,
+        "✏️ Выберите привычку для редактирования:",
+        reply_markup=keyboard
+    )
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("edit_"))
+def edit_habit_complete(call):
+    """
+    Обрабатывает callback-запрос для редактирования привычки.
+    Запрашивает у пользователя новое название привычки.
+
+    Args:
+        call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    """
+    habit_id = call.data.split("_")[1]
+
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+    c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
+    habit_name = c.fetchone()[0]
+    conn.close()
+
+    msg = bot.send_message(
+        call.message.chat.id,
+        f"🔄 Введите новое название для привычки '{habit_name}':",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    bot.register_next_step_handler(
+        msg,
+        lambda message, h_id=habit_id: update_habit_end(message, h_id)
+    )
+
+def update_habit_end(message, habit_id):
+    """
+    Обновляет название привычки на основе введенного пользователем текста.
+
+    Если новое название короче 2 символов, отправляет сообщение об ошибке.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя с новым названием привычки.
+        habit_id (int): Идентификатор привычки, которую нужно обновить.
+    """
+    new_name = message.text.strip()
+
+    if len(new_name) < 2:
+        bot.send_message(
+            message.chat.id,
+            "❌ Название должно быть не короче 2 символов!",
+            reply_markup=create_menu()
+        )
+        return
+
+    update_habit_name(habit_id, new_name)
+
+    bot.send_message(
+        message.chat.id,
+        f"✅ Название привычки успешно обновлено на '{new_name}'!",
+        reply_markup=create_menu()
+    )
+
 # endregion
 
 # region Back to Menu
