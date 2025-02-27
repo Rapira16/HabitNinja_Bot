@@ -234,4 +234,9 @@ def add_habit_end(message):
         bot.send_message(message.chat.id, "Short name", reply_markup=create_menu())
         return
 
+    if add_habit(user_id, habit_name):
+        bot.send_message(message.chat.id, "True", reply_markup=create_menu())
+    else:
+        bot.send_message(message.chat.id, "False", reply_markup=create_menu())
+
 # endregion
