@@ -215,4 +215,63 @@ def start(message):
         reply_markup=create_menu()
     )
 
+@bot.message_handler(func=lambda message: True)
+def handle_text(message):
+    if message.text == "Добавить привычку ➕":
+        add_habit_start(message)
+    else:
+        bot.send_message(message.chat.id, "⚠️ Используй кнопки ниже ⬇️", reply_markup=create_menu())
+
+# region Habit Management
+@bot.message_handler(commands=['add_habit'])
+def add_habit_start(message):
+    """
+    Запрашивает у пользователя название новой привычки.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
+    """
+    msg = bot.send_message(
+        message.chat.id,
+        "➕ Введите название новой привычки:",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    bot.register_next_step_handler(msg, add_habit_end)
+
+def add_habit_end(message):
+    """
+    Обрабатывает введенное пользователем название привычки и добавляет её в список.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя с названием привычки.
+    """
+    user_id = message.from_user.id
+    habit_name = message.text.strip()
+
+    if len(habit_name) < 2:
+        bot.send_message(
+            message.chat.id,
+            "❌ Название должно быть не короче 2 символов!",
+            reply_markup=create_menu()
+        )
+        return
+
+    if add_habit(user_id, habit_name):
+        bot.send_message(
+            message.chat.id,
+            f"✅ Привычка '{habit_name}' успешно добавлена!",
+            reply_markup=create_menu()
+        )
+    else:
+        bot.send_message(
+            message.chat.id,
+            f"❌ Привычка '{habit_name}' уже существует!",
+            reply_markup=create_menu()
+        )
+
 # endregion
+
+if __name__ == "__main__":
+    init_db()
+    print("🚀 Бот успешно запущен!")
+    bot.polling(none_stop=True)
