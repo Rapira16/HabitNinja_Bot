@@ -198,4 +198,21 @@ def create_menu():
     menu.add(KeyboardButton("Установить мотивационное сообщение ⏰"))
     return menu
 
+@bot.message_handler(commands=['start'])
+def start(message):
+    """
+    Обрабатывает команду /start. Приветствует пользователя и отправляет меню для управления привычками.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
+    """
+    user = message.from_user
+    add_user(user.id, user.first_name)
+    bot.send_message(
+        message.chat.id,
+        f"👋 Привет {user.first_name}! Я помогу тебе отслеживать привычки!\n\n"
+        "Используй кнопки ниже для управления:",
+        reply_markup=create_menu()
+    )
+
 # endregion
