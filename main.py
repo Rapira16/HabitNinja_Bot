@@ -351,6 +351,11 @@ def show_stats(message):
         bot.send_message(message.chat.id, "Error", reply_markup=create_menu())
         return
 
+    message_text = "Stats:\n\n" + "\n".join(
+        [f"• {habit[0]}: {habit[1]}" for habit in stats]
+    )
+    bot.send_message(message.chat.id, message_text, reply_markup=create_menu())
+
 # endregion
 
 # region Back to Menu
