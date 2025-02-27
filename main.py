@@ -219,6 +219,8 @@ def start(message):
 def handle_text(message):
     if message.text == "Добавить привычку ➕":
         add_habit_start(message)
+    elif message.text == "Отметить выполнение ✅":
+        track_habit(message)
     else:
         bot.send_message(message.chat.id, "⚠️ Используй кнопки ниже ⬇️", reply_markup=create_menu())
 
