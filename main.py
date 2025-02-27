@@ -431,13 +431,13 @@ def delete_habit_complete(call):
 
     delete_habit(habit_id)
 
-    bot.answer_callback_query(call.id, "Done")
+    bot.answer_callback_query(call.id, f"❌ Привычка '{habit_name}' удалена!")
     bot.edit_message_text(
         chat_id=call.message.chat.id,
         message_id=call.message.message_id,
-        text="Done"
+        text=f"🗑️ Привычка '{habit_name}' успешно удалена!"
     )
-    bot.send_message(call.message.chat.id, "Back", reply_markup=create_menu())
+    bot.send_message(call.message.chat.id, "🏠 Возвращаемся в главное меню:", reply_markup=create_menu())
 
 # endregion
 
