@@ -271,6 +271,11 @@ def add_habit_end(message):
             reply_markup=create_menu()
         )
 
+@bot.message_handler(commands=['track_habit'])
+def track_habit(message):
+    user_id = message.from_user.id
+    habits = get_user_habits(user_id)
+
 # endregion
 
 if __name__ == "__main__":
