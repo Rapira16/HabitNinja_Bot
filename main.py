@@ -286,9 +286,20 @@ def track_habit(message):
         keyboard.add(InlineKeyboardButton(
             text=f"✅ {habit_name}"
         ))
-    keyboard.add(InlineKeyboardButton("Back"))
+    keyboard.add(InlineKeyboardButton("Back", callback_data="back_to_menu"))
 
     bot.send_message(message.chat.id, "Choose", reply_markup=keyboard)
+
+# endregion
+
+# region Back to Menu
+@bot.callback_query_handler(func=lambda call: call.data == "back_to_menu")
+def back_to_menu(call):
+    bot.send_message(
+        chat_id=call.message.chat.id,
+        text="🏠 Возвращаемся в главное меню:",
+        reply_markup=create_menu()
+    )
 
 # endregion
 
