@@ -501,6 +501,13 @@ def edit_habit_start(message):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("edit_"))
 def edit_habit_complete(call):
+    """
+    Обрабатывает callback-запрос для редактирования привычки.
+    Запрашивает у пользователя новое название привычки.
+
+    Args:
+        call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    """
     habit_id = call.data.split("_")[1]
 
     conn = sqlite3.connect('habits.db')
@@ -509,8 +516,15 @@ def edit_habit_complete(call):
     habit_name = c.fetchone()[0]
     conn.close()
 
-    msg = bot.send_message(call.message.chat.id, f"🔄 Введите новое название для привычки '{habit_name}':", reply_markup=ReplyKeyboardRemove())
-    bot.register_next_step_handler(msg, lambda message, h_id=habit_id: update_habit_end(message, h_id))
+    msg = bot.send_message(
+        call.message.chat.id,
+        f"🔄 Введите новое название для привычки '{habit_name}':",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    bot.register_next_step_handler(
+        msg,
+        lambda message, h_id=habit_id: update_habit_end(message, h_id)
+    )
 
 def update_habit_end(message, habit_id):
     new_name = message.text.strip()
