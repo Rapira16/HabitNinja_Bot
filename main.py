@@ -202,5 +202,9 @@ def create_menu():
 def start(message):
     user = message.from_user
     add_user(user.id, user.first_name)
+    bot.send_message(
+        message.chat.id,
+        "Привет"
+    )
 
 # endregion
