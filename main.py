@@ -284,11 +284,16 @@ def track_habit(message):
     for habit in habits:
         habit_id, habit_name = habit
         keyboard.add(InlineKeyboardButton(
-            text=f"✅ {habit_name}"
+            text=f"✅ {habit_name}",
+            callback_data=f"track_{habit_id}"
         ))
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
     bot.send_message(message.chat.id, "📅 Выберите привычку для отметки:", reply_markup=keyboard)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("track_"))
+def track_habit_complete(call):
+    habit_id = call.data.split("_")[1]
 
 # endregion
 
