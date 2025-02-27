@@ -280,6 +280,14 @@ def track_habit(message):
         bot.send_message(message.chat.id, "Not found", reply_markup=create_menu())
         return
 
+    keyboard = InlineKeyboardMarkup()
+    for habit in habits:
+        habit_id, habit_name = habit
+        keyboard.add(InlineKeyboardButton(
+            text=f"✅ {habit_name}"
+        ))
+    keyboard.add(InlineKeyboardButton("Back"))
+
 # endregion
 
 if __name__ == "__main__":
