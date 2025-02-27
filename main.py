@@ -347,6 +347,10 @@ def show_stats(message):
     user_id = message.from_user.id
     stats = get_stats(user_id)
 
+    if not stats:
+        bot.send_message(message.chat.id, "Error", reply_markup=create_menu())
+        return
+
 # endregion
 
 # region Back to Menu
