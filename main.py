@@ -230,4 +230,8 @@ def add_habit_end(message):
     user_id = message.from_user.id
     habit_name = message.text.strip()
 
+    if len(habit_name) < 2:
+        bot.send_message(message.chat.id, "Short name", reply_markup=create_menu())
+        return
+
 # endregion
