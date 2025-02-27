@@ -217,12 +217,39 @@ def start(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_text(message):
+    """
+    Обрабатывает текстовые сообщения от пользователя и вызывает соответствующие функции
+    в зависимости от текста сообщения.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
+    """
     if message.text == "Добавить привычку ➕":
         add_habit_start(message)
     elif message.text == "Отметить выполнение ✅":
         track_habit(message)
+    elif message.text == "Статистика 📊":
+        show_stats(message)
+    elif message.text == "Удалить привычку ❌":
+        delete_habit_start(message)
+    elif message.text == "Редактировать привычку ✏️":
+        edit_habit_start(message)
+    elif message.text == "Установить напоминание ⏰":
+        set_reminder_start(message)
+    elif message.text == "Установить мотивационное сообщение ⏰":
+        set_motivation_start(message)
+    elif message.text == "Назад":
+        bot.send_message(
+            message.chat.id,
+            "Команда отменена.",
+            reply_markup=create_menu()
+        )
     else:
-        bot.send_message(message.chat.id, "⚠️ Используй кнопки ниже ⬇️", reply_markup=create_menu())
+        bot.send_message(
+            message.chat.id,
+            "⚠️ Используй кнопки ниже ⬇️",
+            reply_markup=create_menu()
+        )
 
 # region Habit Management
 @bot.message_handler(commands=['add_habit'])
@@ -337,6 +364,37 @@ def track_habit_complete(call):
     bot.send_message(
         call.message.chat.id,
         "🏠 Возвращаемся в главное меню:",
+        reply_markup=create_menu()
+    )
+
+@bot.message_handler(commands=['stats'])
+def show_stats(message):
+    """
+    Отображает статистику выполнения привычек пользователя.
+
+    Если статистика отсутствует, отправляет сообщение об этом.
+
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
+    """
+    user_id = message.from_user.id
+    stats = get_stats(user_id)
+
+    if not stats:
+        bot.send_message(
+            message.chat.id,
+            "📊 Статистика пока пуста.",
+            reply_markup=create_menu()
+        )
+        return
+
+    message_text = "📊 Ваша статистика:\n\n" + "\n".join(
+        [f"• {habit[0]}: {habit[1]} раз" for habit in stats]
+    )
+
+    bot.send_message(
+        message.chat.id,
+        message_text,
         reply_markup=create_menu()
     )
 
