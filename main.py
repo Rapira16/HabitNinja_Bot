@@ -178,3 +178,10 @@ def update_habit_name(habit_id, new_name):
     conn.commit()
     conn.close()
 # endregion
+
+# region Menu & Handlers
+def create_menu():
+    menu = ReplyKeyboardMarkup(resize_keyboard=True)
+    return menu
+
+# endregion
