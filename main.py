@@ -68,14 +68,14 @@ def add_user(user_id, name, motivation_time=None):
 
 def add_habit(user_id, habit_name):
     """
-    Добавляет новую привычку в базу данных.
+        Добавляет новую привычку в базу данных.
 
-    Args:
-        user_id (int): Уникальный идентификатор пользователя.
-        habit_name (str): Название привычки.
+        Args:
+            user_id (int): Уникальный идентификатор пользователя.
+            habit_name (str): Название привычки.
 
-    Returns:
-        bool: True, если добавление прошло успешно, иначе False.
+        Returns:
+            bool: True, если добавление прошло успешно, иначе False.
     """
     conn = sqlite3.connect('habits.db')
     c = conn.cursor()
@@ -125,6 +125,23 @@ def update_user_reminders(habit_id, new_time):
     c = conn.cursor()
 
     c.execute(f"UPDATE reminder SET reminder_time = {new_time} WHERE id=?", (habit_id,))
+
+    conn.commit()
+    conn.close()
+
+
+def update_user_motivation(user_id, new_time):
+    """
+        Обновляет интервал для рассылки мотивационных сообщений для пользователя.
+
+        Args:
+            user_id (int): Уникальный идентификатор пользователя.
+            new_time (str): Название привычки.
+    """
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+
+    c.execute(f"UPDATE users SET motivation_time = {new_time} WHERE user_id=?", (user_id,))
 
     conn.commit()
     conn.close()
@@ -673,6 +690,17 @@ def schedule_motivation_start(message):
         "💪🏻 Сколько мотивации ты хочешь???",
         reply_markup=keyboard
     )
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("motiv_"))
+def schedule_motivation_end(call):
+    """
+        Обрабатывает callback-запрос для редактирования интервала для мотивационных сообщений.
+
+        Args:
+            call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    """
+    user_id = call.chat.id
+
 
 
 # endregion
