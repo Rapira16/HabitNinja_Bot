@@ -113,11 +113,6 @@ def get_user_habits(user_id):
     return habits
 
 
-def get_user_reminders(user_id):
-
-    # todo: а оно надо вообще?
-
-
 def update_user_reminders(habit_id, new_time):
     """
         Обновляет данные о времени напоминания конкретной привычки.
@@ -130,6 +125,7 @@ def update_user_reminders(habit_id, new_time):
     c = conn.cursor()
 
     c.execute(f"UPDATE reminder SET reminder_time = {new_time} WHERE id=?", (habit_id,))
+
     conn.commit()
     conn.close()
 
