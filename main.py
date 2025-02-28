@@ -113,6 +113,23 @@ def get_user_habits(user_id):
     return habits
 
 
+def update_user_reminders(habit_id, new_time):
+    """
+        Обновляет данные о времени напоминания конкретной привычки.
+
+        Args:
+            habit_id (int): Идентефикатор конкретной привычки.
+            new_time (str): Новое интервал для отображения напоминания о привычке.
+    """
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+
+    c.execute(f"UPDATE reminder SET reminder_time = {new_time} WHERE id=?", (habit_id,))
+
+    conn.commit()
+    conn.close()
+
+
 def update_habit_count(habit_id):
     """
     Увеличивает счетчик выполнения привычки на 1.
@@ -235,9 +252,9 @@ def handle_text(message):
     elif message.text == "Редактировать привычку ✏️":
         edit_habit_start(message)
     elif message.text == "Установить напоминание ⏰":
-        set_reminder_start(message)
+        schedule_reminder_start(message)
     elif message.text == "Установить мотивационное сообщение ⏰":
-        set_motivation_start(message)
+        schedule_motivation(message)
     elif message.text == "Назад":
         bot.send_message(
             message.chat.id,
@@ -553,6 +570,88 @@ def update_habit_end(message, habit_id):
         f"✅ Название привычки успешно обновлено на '{new_name}'!",
         reply_markup=create_menu()
     )
+
+@bot.message_handler(commands=['schedule_reminder'])
+def schedule_reminder_start(message):
+    """
+        Отображает список привычек пользователя для редактирования напоминаний о них.
+
+        Если у пользователя нет привычек, отправляет сообщение об этом.
+
+        Args:
+            message (types.Message): Объект сообщения от пользователя.
+    """
+    user_id = message.from_user.id
+    habits = get_user_habits(user_id)
+
+    if not habits:
+        bot.send_message(
+            message.chat.id,
+            "❌ У вас нет добавленных привычек.",
+            reply_markup=create_menu()
+        )
+        return
+
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    for habit in habits:
+        habit_id, habit_name = habit
+        keyboard.add(InlineKeyboardButton(
+            text=f"✏️ {habit_name}",
+            callback_data=f"reminder1_{habit_id}"
+        ))
+    keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
+
+    bot.send_message(
+        message.chat.id,
+        "⏰️ Выберите привычку для установки напоминания:",
+        reply_markup=keyboard
+    )
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("reminder1_"))
+def schedule_reminder_middle(call):
+    """
+        Обрабатывает callback-запрос для редактирования напоминания о привычке.
+        Запрашивает у пользователя новый интервал для привычки.
+
+        Args:
+            call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    """
+    habit_id = call.data.split()[1]
+
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в час", callback_data=f"reminder2_h_{habit_id}"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в день", callback_data=f"reminder2_d_{habit_id}"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в неделю", callback_data=f"reminder2_w_{habit_id}"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в месяц", callback_data=f"reminder2_m_{habit_id}"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в год", callback_data=f"reminder2_y_{habit_id}"))
+
+    keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
+
+    bot.send_message(
+        call.message.chat.id,
+        "⏰️ Выберите интервал, с которым вы хотите получать напоминания:",
+        reply_markup=keyboard
+    )
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("reminder2_"))
+def schedule_reminder_end(call):
+    """
+        Обрабатывает callback-запрос для редактирования напоминания о привычке.
+        Подтверждает ответ пользователя и отпраляет запрос в БД на обновление интервала.
+
+        Args:
+            call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    """
+    interval, habit_id = call.data.split()[1:]
+
+    update_user_reminders(habit_id, interval)
+
+    bot.send_message(
+        call.message.chat.id,
+        "⏰️ Новый интервал установлен!",
+        reply_markup=create_menu()
+    )
+
 
 # endregion
 
