@@ -123,6 +123,23 @@ def get_user_reminders(user_id):
         Returns:
             list: Список привычек пользователя в виде кортежей (id, habit_name).
     """
+    # todo: а оно надо вообще?
+
+
+def update_user_reminders(habit_id, new_time):
+    """
+        Обновляет данные о времени напоминания конкретной привычки.
+
+        Args:
+            habit_id (int): Идентефикатор конкретной привычки.
+            new_time (str): Новое интервал для отображения напоминания о привычке.
+    """
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+
+    c.execute(f"UPDATE reminder SET reminder_time = {new_time} WHERE id=?", (habit_id,))
+    conn.commit()
+    conn.close()
 
 
 def update_habit_count(habit_id):
