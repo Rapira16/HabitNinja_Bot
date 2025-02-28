@@ -212,7 +212,7 @@ def create_menu():
     menu.add(KeyboardButton("Удалить привычку ❌"))
     menu.add(KeyboardButton("Редактировать привычку ✏️"))
     menu.add(KeyboardButton("Установить напоминание ⏰"))
-    menu.add(KeyboardButton("Установить мотивационное сообщение ⏰"))
+    menu.add(KeyboardButton("Установить мотивационное сообщение 💪🏻"))
     return menu
 
 @bot.message_handler(commands=['start'])
@@ -253,8 +253,8 @@ def handle_text(message):
         edit_habit_start(message)
     elif message.text == "Установить напоминание ⏰":
         schedule_reminder_start(message)
-    elif message.text == "Установить мотивационное сообщение ⏰":
-        schedule_motivation(message)
+    elif message.text == "Установить мотивационное сообщение 💪🏻":
+        schedule_motivation_start(message)
     elif message.text == "Назад":
         bot.send_message(
             message.chat.id,
@@ -650,6 +650,28 @@ def schedule_reminder_end(call):
         call.message.chat.id,
         "⏰️ Новый интервал установлен!",
         reply_markup=create_menu()
+    )
+
+@bot.message_handler(commands=['schedule_motivation'])
+def schedule_motivation_start(message):
+    """
+        Спрашивает у пользователя, как часто он хочет получать мотивационные сообщения от бота.
+
+        Args:
+            message (types.Message): Объект сообщения от пользователя.
+    """
+    keyboard = InlineKeyboardMarkup(row_width=1)
+
+    keyboard.add(InlineKeyboardButton(text="💪🏻💪🏻💪🏻 ОЧЕНЬ много (ежеминутно)", callback_data="motiv_min"))
+    keyboard.add(InlineKeyboardButton(text="💪🏻💪🏻 Много (каждый час)", callback_data="motiv_hour"))
+    keyboard.add(InlineKeyboardButton(text="💪🏻 Немного (каджый день)", callback_data="motiv_day"))
+    keyboard.add(InlineKeyboardButton(text=" Мало (каджую неделю)", callback_data="motiv_week"))
+    keyboard.add(InlineKeyboardButton(text="-💪🏻 Совсем мало (каджый месяц)", callback_data="motiv_month"))
+
+    bot.send_message(
+        message.chat.id,
+        "💪🏻 Сколько мотивации ты хочешь???",
+        reply_markup=keyboard
     )
 
 
