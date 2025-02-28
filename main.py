@@ -623,19 +623,39 @@ def schedule_reminder_middle(call):
     habit_id = call.data.split()[1]
 
     keyboard = InlineKeyboardMarkup(row_width=1)
-    keyboard.add(InlineKeyboardButton(text="⏰ Раз в час", callback_data="reminder2_h"))
-    keyboard.add(InlineKeyboardButton(text="⏰ Раз в день", callback_data="reminder2_d"))
-    keyboard.add(InlineKeyboardButton(text="⏰ Раз в неделю", callback_data="reminder2_w"))
-    keyboard.add(InlineKeyboardButton(text="⏰ Раз в месяц", callback_data="reminder2_m"))
-    keyboard.add(InlineKeyboardButton(text="⏰ Раз в год", callback_data="reminder2_y"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в час", callback_data=f"reminder2_h_{habit_id}"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в день", callback_data=f"reminder2_d_{habit_id}"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в неделю", callback_data=f"reminder2_w_{habit_id}"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в месяц", callback_data=f"reminder2_m_{habit_id}"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в год", callback_data=f"reminder2_y_{habit_id}"))
 
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
     bot.send_message(
         call.message.chat.id,
-        "⏰️ Выберите привычку для установки напоминания:",
+        "⏰️ Выберите интервал, с которым вы хотите получать напоминания:",
         reply_markup=keyboard
     )
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("reminder2_"))
+def schedule_reminder_end(call):
+    """
+        Обрабатывает callback-запрос для редактирования напоминания о привычке.
+        Подтверждает ответ пользователя и отпраляет запрос в БД на обновление интервала.
+
+        Args:
+            call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    """
+    interval, habit_id = call.data.split()[1:]
+
+    update_user_reminders(habit_id, interval)
+
+    bot.send_message(
+        call.message.chat.id,
+        "⏰️ Новый интервал установлен!",
+        reply_markup=create_menu()
+    )
+
 
 # endregion
 
