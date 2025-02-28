@@ -114,15 +114,7 @@ def get_user_habits(user_id):
 
 
 def get_user_reminders(user_id):
-    """
-        Получает все напоминания о привычках пользователя.
 
-        Args:
-            user_id (int): Уникальный идентификатор пользователя.
-
-        Returns:
-            list: Список привычек пользователя в виде кортежей (id, habit_name).
-    """
     # todo: а оно надо вообще?
 
 
@@ -623,11 +615,27 @@ def schedule_reminder_start(message):
 def schedule_reminder_middle(call):
     """
         Обрабатывает callback-запрос для редактирования напоминания о привычке.
-        Запрашивает у пользователя новое название привычки.
+        Запрашивает у пользователя новый интервал для привычки.
 
         Args:
             call (types.CallbackQuery): Объект callback-запроса от пользователя.
     """
+    habit_id = call.data.split()[1]
+
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в час", callback_data="reminder2_h"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в день", callback_data="reminder2_d"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в неделю", callback_data="reminder2_w"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в месяц", callback_data="reminder2_m"))
+    keyboard.add(InlineKeyboardButton(text="⏰ Раз в год", callback_data="reminder2_y"))
+
+    keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
+
+    bot.send_message(
+        call.message.chat.id,
+        "⏰️ Выберите привычку для установки напоминания:",
+        reply_markup=keyboard
+    )
 
 # endregion
 
