@@ -113,6 +113,18 @@ def get_user_habits(user_id):
     return habits
 
 
+def get_user_reminders(user_id):
+    """
+        Получает все напоминания о привычках пользователя.
+
+        Args:
+            user_id (int): Уникальный идентификатор пользователя.
+
+        Returns:
+            list: Список привычек пользователя в виде кортежей (id, habit_name).
+    """
+
+
 def update_habit_count(habit_id):
     """
     Увеличивает счетчик выполнения привычки на 1.
@@ -235,9 +247,9 @@ def handle_text(message):
     elif message.text == "Редактировать привычку ✏️":
         edit_habit_start(message)
     elif message.text == "Установить напоминание ⏰":
-        set_reminder_start(message)
+        schedule_reminder_start(message)
     elif message.text == "Установить мотивационное сообщение ⏰":
-        set_motivation_start(message)
+        schedule_motivation(message)
     elif message.text == "Назад":
         bot.send_message(
             message.chat.id,
@@ -553,6 +565,52 @@ def update_habit_end(message, habit_id):
         f"✅ Название привычки успешно обновлено на '{new_name}'!",
         reply_markup=create_menu()
     )
+
+@bot.message_handler(commands=['schedule_reminder'])
+def schedule_reminder_start(message):
+    """
+        Отображает список привычек пользователя для редактирования напоминаний о них.
+
+        Если у пользователя нет привычек, отправляет сообщение об этом.
+
+        Args:
+            message (types.Message): Объект сообщения от пользователя.
+    """
+    user_id = message.from_user.id
+    habits = get_user_habits(user_id)
+
+    if not habits:
+        bot.send_message(
+            message.chat.id,
+            "❌ У вас нет добавленных привычек.",
+            reply_markup=create_menu()
+        )
+        return
+
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    for habit in habits:
+        habit_id, habit_name = habit
+        keyboard.add(InlineKeyboardButton(
+            text=f"✏️ {habit_name}",
+            callback_data=f"reminder1_{habit_id}"
+        ))
+    keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
+
+    bot.send_message(
+        message.chat.id,
+        "⏰️ Выберите привычку для установки напоминания:",
+        reply_markup=keyboard
+    )
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("reminder1_"))
+def schedule_reminder_middle(call):
+    """
+        Обрабатывает callback-запрос для редактирования напоминания о привычке.
+        Запрашивает у пользователя новое название привычки.
+
+        Args:
+            call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    """
 
 # endregion
 
