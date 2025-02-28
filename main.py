@@ -633,7 +633,7 @@ def schedule_reminder_middle(call):
         Args:
             call (types.CallbackQuery): Объект callback-запроса от пользователя.
     """
-    habit_id = call.data.split()[1]
+    habit_id = call.data.split('_')[1]
 
     keyboard = InlineKeyboardMarkup(row_width=1)
     keyboard.add(InlineKeyboardButton(text="⏰ Раз в час", callback_data=f"reminder2_h_{habit_id}"))
@@ -659,7 +659,7 @@ def schedule_reminder_end(call):
         Args:
             call (types.CallbackQuery): Объект callback-запроса от пользователя.
     """
-    interval, habit_id = call.data.split()[1:]
+    interval, habit_id = call.data.split('_')[1:]
 
     update_user_reminders(habit_id, interval)
 
@@ -699,8 +699,16 @@ def schedule_motivation_end(call):
         Args:
             call (types.CallbackQuery): Объект callback-запроса от пользователя.
     """
-    user_id = call.chat.id
+    user_id = call.message.chat.id
+    interval = call.data.split('_')[1]
 
+    update_user_motivation(user_id, interval)
+
+    bot.send_message(
+        call.message.chat.id,
+        "️💪🏻 Новый интервал для мотивации установлен!",
+        reply_markup=create_menu()
+    )
 
 
 # endregion
