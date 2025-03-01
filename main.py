@@ -770,7 +770,11 @@ def schedule_reminder_end(call):
     """
     interval, habit_id = call.data.split('_')[1:]
 
-    update_user_reminders(habit_id, interval)
+    if check_reminder(habit_id):
+        update_user_reminders(habit_id, interval)
+    else:
+        user = call.message.from_user
+        add_reminder(user.id, habit_id, interval)
 
     bot.send_message(
         call.message.chat.id,
