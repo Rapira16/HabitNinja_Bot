@@ -180,7 +180,7 @@ def add_reminder(user_id, habit_id, new_time):
         conn.close()
 
 
-def check_reminder(habit_id):
+def check_reminder(habit_id) -> bool:
     """
         Получает все привычки пользователя.
 
@@ -348,7 +348,7 @@ def start(message):
     Args:
         message (types.Message): Объект сообщения от пользователя.
     """
-    user = message.from_user
+    user = message.chat
     add_user(user.id, user.first_name)
     bot.send_message(
         message.chat.id,
@@ -773,7 +773,7 @@ def schedule_reminder_end(call):
     if check_reminder(habit_id):
         update_user_reminders(habit_id, interval)
     else:
-        user = call.message.from_user
+        user = call.message.chat
         add_reminder(user.id, habit_id, interval)
 
     bot.send_message(
@@ -822,6 +822,20 @@ def schedule_motivation_end(call):
         call.message.chat.id,
         "️💪🏻 Новый интервал для мотивации установлен!",
         reply_markup=create_menu()
+    )
+
+def send_motivation(user_id):
+    """
+        Отправляет мотивационные сообщения пользователю.
+
+        Args:
+            user_id (int): Уникальный идентефикатор пользователя.
+    """
+    quote = random.choice(motivation)
+
+    bot.send_message(
+        user_id,
+        text=quote
     )
 
 
