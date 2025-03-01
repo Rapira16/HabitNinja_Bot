@@ -69,6 +69,18 @@ motivation = [
     "Ты — творец своей судьбы."
 ]
 
+intervals = {
+    'min': 60,
+    'h': 60 * 60,
+    'hour': 60 * 60,
+    'd': 60 * 60 * 24,
+    'day': 60 * 60 * 24,
+    'w': 60 * 60 * 24 * 30,
+    'week': 60 * 60 * 24 * 7,
+    'm': 60 * 60 * 24 * 30,
+    'y': 60 * 60 * 24 * 30 * 12
+}
+
 # region Database Functions
 def init_db():
     """
@@ -80,7 +92,10 @@ def init_db():
     c = conn.cursor()
 
     c.execute('''CREATE TABLE IF NOT EXISTS users
-                 (user_id INTEGER PRIMARY KEY, name TEXT, motivation_time TEXT)''')
+                 (user_id INTEGER PRIMARY KEY,
+                  name TEXT,
+                  motivation_time TEXT,
+                  last_motivation INTEGER)''')
 
     c.execute('''CREATE TABLE IF NOT EXISTS habits
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,7 +109,8 @@ def init_db():
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id INTEGER,
                   habit_id INTEGER,
-                  reminder_time TEXT)''')
+                  reminder_time TEXT,
+                  last_reminded INTEGER)''')
 
     conn.commit()
     conn.close()
@@ -109,11 +125,13 @@ def add_user(user_id, name, motivation_time=None):
         name (str): Имя пользователя.
         motivation_time (str, optional): Время, когда пользователь получает мотивацию. По умолчанию None.
     """
+    last_motivation = 0
+
     conn = sqlite3.connect('habits.db')
     c = conn.cursor()
 
-    c.execute("INSERT OR IGNORE INTO users (user_id, name, motivation_time) VALUES (?, ?, ?)",
-              (user_id, name, motivation_time))
+    c.execute("INSERT OR IGNORE INTO users (user_id, name, motivation_time, last_motivation) VALUES (?, ?, ?, ?)",
+              (user_id, name, motivation_time, last_motivation))
 
     conn.commit()
     conn.close()
@@ -144,6 +162,55 @@ def add_habit(user_id, habit_name):
         return False
     finally:
         conn.close()
+
+
+def add_reminder(user_id, habit_id, new_time):
+    """
+        Добавляет время для напоминания про привычку.
+
+        Args:
+            user_id (int): Уникальный идентификатор пользователя.
+            habit_id (int): Идентефикационный номер привычки.
+            new_time (str): Интервал для напоминания о привычке.
+
+        Returns:
+            bool: True, если добавление прошло успешно, иначе False.
+    """
+    last_reminded = 0
+
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+
+    try:
+        c.execute("INSERT INTO reminders (user_id, habit_id, reminder_time, last_reminded) VALUES (?, ?, ?, ?)",
+                  (user_id, habit_id, new_time, last_reminded))
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+    finally:
+        conn.close()
+
+
+def check_reminder(habit_id) -> bool:
+    """
+        Получает все привычки пользователя.
+
+        Args:
+            habit_id (int): Уникальный идентификатор привычки.
+
+        Returns:
+            bool: Если напоминание уже есть, то возвращает True, иначе False.
+    """
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+
+    c.execute("SELECT reminder_time FROM reminders WHERE habit_id=?", (habit_id,))
+    reminder = c.fetchone()
+
+    if reminder is not None:
+        return True
+    return False
 
 
 def get_user_habits(user_id):
@@ -177,7 +244,7 @@ def update_user_reminders(habit_id, new_time):
     conn = sqlite3.connect('habits.db')
     c = conn.cursor()
 
-    c.execute(f"UPDATE reminder SET reminder_time = {new_time} WHERE id=?", (habit_id,))
+    c.execute(f"UPDATE reminders SET reminder_time = {new_time} WHERE habit_id=?", (habit_id,))
 
     conn.commit()
     conn.close()
@@ -293,7 +360,7 @@ def start(message):
     Args:
         message (types.Message): Объект сообщения от пользователя.
     """
-    user = message.from_user
+    user = message.chat
     add_user(user.id, user.first_name)
     bot.send_message(
         message.chat.id,
@@ -641,6 +708,7 @@ def update_habit_end(message, habit_id):
         reply_markup=create_menu()
     )
 
+# region Reminders
 @bot.message_handler(commands=['schedule_reminder'])
 def schedule_reminder_start(message):
     """
@@ -714,7 +782,11 @@ def schedule_reminder_end(call):
     """
     interval, habit_id = call.data.split('_')[1:]
 
-    update_user_reminders(habit_id, interval)
+    if check_reminder(habit_id):
+        update_user_reminders(habit_id, interval)
+    else:
+        user = call.message.chat
+        add_reminder(user.id, habit_id, interval)
 
     bot.send_message(
         call.message.chat.id,
@@ -722,6 +794,28 @@ def schedule_reminder_end(call):
         reply_markup=create_menu()
     )
 
+def send_reminder(user_id, habit_id):
+    """
+        Отправляет напоминания о выполнении привычки пользователю.
+
+        Args:
+            user_id (int): Уникальный идентефикатор пользователя.
+            habit_id (int): Идентефикатор конкретной привычки.
+    """
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+
+    c.execute("SELECT habit_name FROM habits WHERE habit_id=?", (habit_id,))
+    habit_name = c.fetchone()
+
+    conn.close()
+
+    bot.send_message(
+        user_id,
+        text=f"⏰ Напоминание, что вам пора {habit_name}!"
+    )
+
+# region Motivation
 @bot.message_handler(commands=['schedule_motivation'])
 def schedule_motivation_start(message):
     """
@@ -763,8 +857,55 @@ def schedule_motivation_end(call):
         reply_markup=create_menu()
     )
 
+def send_motivation(user_id):
+    """
+        Отправляет мотивационные сообщения пользователю.
+
+        Args:
+            user_id (int): Уникальный идентефикатор пользователя.
+    """
+    quote = random.choice(motivation)
+
+    bot.send_message(
+        user_id,
+        text=quote
+    )
 
 # endregion
+
+def run_scheduler():
+    """
+        Проверяет, не пора ли оправлять напоминания и мотивацию.
+    """
+    fl = True
+
+    while True:
+        conn = sqlite3.connect('habits.db')
+        c = conn.cursor()
+
+        c.execute("SELECT user_id, habit_id, reminder_time, last_reminded FROM reminders")
+        reminders = c.fetchall()
+        c.execute("SELECT user_id, motivation_time, last_motivation FROM users")
+        motivations = c.fetchall()
+
+        for rem in reminders:
+            if rem[3] + intervals[rem[2]] >= time.time():
+                send_reminder(rem[0], rem[1])
+                c.execute(f"UPDATE reminders SET last_reminded = {time.time()} WHERE habit_id=?",
+                          (rem[1],))
+
+        for motiv in motivations:
+            if motiv[2] + intervals[motiv[1]] >= time.time():
+                send_motivation(motiv[0])
+                c.execute(f"UPDATE users SET last_motivation = {time.time()} WHERE user_id=?",
+                          (motiv[0],))
+
+        conn.commit()
+        conn.close()
+
+
+
+
 
 # region Back to Menu
 @bot.callback_query_handler(func=lambda call: call.data == "back_to_menu")
