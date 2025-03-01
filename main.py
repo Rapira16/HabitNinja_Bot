@@ -794,6 +794,27 @@ def schedule_reminder_end(call):
         reply_markup=create_menu()
     )
 
+def send_reminder(user_id, habit_id):
+    """
+        Отправляет напоминания о выполнении привычки пользователю.
+
+        Args:
+            user_id (int): Уникальный идентефикатор пользователя.
+            habit_id (int): Идентефикатор конкретной привычки.
+    """
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+
+    c.execute("SELECT habit_name FROM habits WHERE habit_id=?", (habit_id,))
+    habit_name = c.fetchone()
+
+    conn.close()
+
+    bot.send_message(
+        user_id,
+        text=f"⏰ Напоминание, что вам пора {habit_name}!"
+    )
+
 # region Motivation
 @bot.message_handler(commands=['schedule_motivation'])
 def schedule_motivation_start(message):
