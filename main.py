@@ -874,6 +874,9 @@ def send_motivation(user_id):
 # endregion
 
 def run_scheduler():
+    """
+        Проверяет, не пора ли оправлять напоминания и мотивацию.
+    """
     fl = True
 
     while True:
@@ -887,13 +890,15 @@ def run_scheduler():
 
         for rem in reminders:
             if rem[3] + intervals[rem[2]] >= time.time():
-                send_reminder(rem[0])
-                c.execute(f"UPDATE reminders SET last_reminded = {time.time()} WHERE habit_id=?", (rem[1],))
+                send_reminder(rem[0], rem[1])
+                c.execute(f"UPDATE reminders SET last_reminded = {time.time()} WHERE habit_id=?",
+                          (rem[1],))
 
         for motiv in motivations:
             if motiv[2] + intervals[motiv[1]] >= time.time():
                 send_motivation(motiv[0])
-                c.execute(f"UPDATE users SET last_motivation = {time.time()} WHERE user_id=?", (motiv[0],))
+                c.execute(f"UPDATE users SET last_motivation = {time.time()} WHERE user_id=?",
+                          (motiv[0],))
 
         conn.commit()
         conn.close()
