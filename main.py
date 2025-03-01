@@ -80,7 +80,10 @@ def init_db():
     c = conn.cursor()
 
     c.execute('''CREATE TABLE IF NOT EXISTS users
-                 (user_id INTEGER PRIMARY KEY, name TEXT, motivation_time TEXT)''')
+                 (user_id INTEGER PRIMARY KEY,
+                  name TEXT,
+                  motivation_time TEXT,
+                  last_motivation TEXT)''')
 
     c.execute('''CREATE TABLE IF NOT EXISTS habits
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,7 +97,8 @@ def init_db():
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id INTEGER,
                   habit_id INTEGER,
-                  reminder_time TEXT)''')
+                  reminder_time TEXT,
+                  last_reminded TEXT)''')
 
     conn.commit()
     conn.close()
@@ -109,11 +113,13 @@ def add_user(user_id, name, motivation_time=None):
         name (str): Имя пользователя.
         motivation_time (str, optional): Время, когда пользователь получает мотивацию. По умолчанию None.
     """
+    last_motivation = "00.00.0000 00:00"
+
     conn = sqlite3.connect('habits.db')
     c = conn.cursor()
 
-    c.execute("INSERT OR IGNORE INTO users (user_id, name, motivation_time) VALUES (?, ?, ?)",
-              (user_id, name, motivation_time))
+    c.execute("INSERT OR IGNORE INTO users (user_id, name, motivation_time, last_motivation) VALUES (?, ?, ?, ?)",
+              (user_id, name, motivation_time, last_motivation))
 
     conn.commit()
     conn.close()
@@ -641,6 +647,7 @@ def update_habit_end(message, habit_id):
         reply_markup=create_menu()
     )
 
+# region Reminders
 @bot.message_handler(commands=['schedule_reminder'])
 def schedule_reminder_start(message):
     """
@@ -722,6 +729,7 @@ def schedule_reminder_end(call):
         reply_markup=create_menu()
     )
 
+# region Motivation
 @bot.message_handler(commands=['schedule_motivation'])
 def schedule_motivation_start(message):
     """
