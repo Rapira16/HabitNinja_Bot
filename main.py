@@ -152,6 +152,34 @@ def add_habit(user_id, habit_name):
         conn.close()
 
 
+def add_reminder(user_id, habit_id, new_time):
+    """
+        Добавляет время для напоминания про привычку.
+
+        Args:
+            user_id (int): Уникальный идентификатор пользователя.
+            habit_id (int): Идентефикационный номер привычки.
+            new_time (str): Интервал для напоминания о привычке.
+
+        Returns:
+            bool: True, если добавление прошло успешно, иначе False.
+    """
+    last_reminded = "00.00.0000 00:00"
+
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+
+    try:
+        c.execute("INSERT INTO reminders (user_id, habit_id, reminder_time, last_reminded) VALUES (?, ?, ?, ?)",
+                  (user_id, habit_id, new_time, last_reminded))
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+    finally:
+        conn.close()
+
+
 def get_user_habits(user_id):
     """
     Получает все привычки пользователя.
