@@ -180,6 +180,27 @@ def add_reminder(user_id, habit_id, new_time):
         conn.close()
 
 
+def check_reminder(habit_id):
+    """
+        Получает все привычки пользователя.
+
+        Args:
+            habit_id (int): Уникальный идентификатор привычки.
+
+        Returns:
+            bool: Если напоминание уже есть, то возвращает True, иначе False.
+    """
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
+
+    c.execute("SELECT reminder_time FROM reminders WHERE habit_id=?", (habit_id,))
+    reminder = c.fetchone()
+
+    if reminder is not None:
+        return True
+    return False
+
+
 def get_user_habits(user_id):
     """
     Получает все привычки пользователя.
