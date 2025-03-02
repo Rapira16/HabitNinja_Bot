@@ -1,0 +1,6 @@
+setup.py
+HabitNinja_Bot.egg-info/PKG-INFO
+HabitNinja_Bot.egg-info/SOURCES.txt
+HabitNinja_Bot.egg-info/dependency_links.txt
+HabitNinja_Bot.egg-info/requires.txt
+HabitNinja_Bot.egg-info/top_level.txt

@@ -1,0 +1,56 @@
+Metadata-Version: 2.1
+Name: HabitNinja-Bot
+Version: 0.1.2
+Summary: Бот трекер привычек
+Home-page: https://github.com/Rapira16/HabitNinja_Bot
+Author: Han
+Author-email: Han@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: certifi
+Requires-Dist: charset-normalizer
+Requires-Dist: idna
+Requires-Dist: pyTelegramBotAPI
+Requires-Dist: requests
+Requires-Dist: schedule
+Requires-Dist: telebot
+Requires-Dist: urllib3
+
+<p align="center">
+  <h1>Habit Tracker Bot</h1>
+</p>
+
+<p align="center">
+  <img src="https://github.com/Rapira16/HabitNinja_Bot/blob/main/photo_2025-02-21_11-45-48.jpg?raw=true" alt="Habit Tracker Bot" />
+</p>
+
+## Описание
+
+Habit Tracker Bot — это Telegram-бот, который помогает пользователям отслеживать и развивать свои привычки. С помощью этого бота вы можете добавлять привычки, отмечать их выполнение, просматривать статистику, редактировать и удалять привычки, а также получать напоминания и мотивационные сообщения.
+
+## Функции
+
+- **Добавление привычки**: Легко добавляйте новые привычки, которые хотите развивать.
+- **Отметка привычки**: Отмечайте выполнение привычек каждый день.
+- **Статистика по привычкам**: Просматривайте статистику выполнения привычек за определенный период.
+- **Удаление привычки**: Удаляйте привычки, которые больше не актуальны.
+- **Редактирование привычки**: Изменяйте детали привычек по мере необходимости.
+- **Добавление напоминания**: Устанавливайте напоминания о привычках, чтобы не забывать о них.
+- **Отправка мотивационных сообщений**: Получайте вдохновляющие сообщения, чтобы поддерживать мотивацию.
+
+## Установка
+
+1. Клонируйте репозиторий:
+
+   ```bash
+   git clone https://github.com/yourusername/habit-tracker-bot.git
+   cd habit-tracker-bot
+   ```
+
+2. Установите зависимости:
+   ```bash
+   pip install -r requirements.txt
+   ```
