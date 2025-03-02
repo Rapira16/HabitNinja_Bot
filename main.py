@@ -1,7 +1,6 @@
 import telebot
 import sqlite3
 from datetime import datetime
-import schedule
 import time
 import threading
 import random
@@ -10,14 +9,13 @@ from telebot.types import (
     InlineKeyboardButton,
     ReplyKeyboardMarkup,
     KeyboardButton,
-    ReplyKeyboardRemove
+    ReplyKeyboardRemove,
 )
 
 bot = telebot.TeleBot("8094395413:AAGlIanHK3Ji99-N90Nkinvqk4ikRJlkeQg")
 
 motivation = [
-    "Верь в себя, и мир поверит в тебя."
-    "Верь в себя, и мир поверит в тебя.",
+    "Верь в себя, и мир поверит в тебя." "Верь в себя, и мир поверит в тебя.",
     "Каждый день — новый шанс изменить свою жизнь.",
     "Успех — это результат упорства.",
     "Не бойся ошибок, бойся бездействия.",
@@ -66,19 +64,19 @@ motivation = [
     "Будь тем, кто вдохновляет других.",
     "Успех — это результат постоянства.",
     "Живи с намерением и страстью.",
-    "Ты — творец своей судьбы."
+    "Ты — творец своей судьбы.",
 ]
 
 intervals = {
-    'min': 60,
-    'h': 60 * 60,
-    'hour': 60 * 60,
-    'd': 60 * 60 * 24,
-    'day': 60 * 60 * 24,
-    'w': 60 * 60 * 24 * 30,
-    'week': 60 * 60 * 24 * 7,
-    'm': 60 * 60 * 24 * 30,
-    'y': 60 * 60 * 24 * 30 * 12
+    "min": 60,
+    "h": 60 * 60,
+    "hour": 60 * 60,
+    "d": 60 * 60 * 24,
+    "day": 60 * 60 * 24,
+    "w": 60 * 60 * 24 * 30,
+    "week": 60 * 60 * 24 * 7,
+    "m": 60 * 60 * 24 * 30,
+    "y": 60 * 60 * 24 * 30 * 12,
 }
 
 # region Database Functions
@@ -88,29 +86,35 @@ def init_db():
 
     Создает таблицы 'users', 'habits' и 'reminders', если они еще не существуют.
     """
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
-    c.execute('''CREATE TABLE IF NOT EXISTS users
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS users
                  (user_id INTEGER PRIMARY KEY,
                   name TEXT,
                   motivation_time TEXT,
-                  last_motivation INTEGER)''')
+                  last_motivation INTEGER)"""
+    )
 
-    c.execute('''CREATE TABLE IF NOT EXISTS habits
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS habits
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id INTEGER,
                   habit_name TEXT,
                   created_date TEXT,
                   count INTEGER DEFAULT 0,
-                  UNIQUE(user_id, habit_name))''')
+                  UNIQUE(user_id, habit_name))"""
+    )
 
-    c.execute('''CREATE TABLE IF NOT EXISTS reminders
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS reminders
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id INTEGER,
                   habit_id INTEGER UNIQUE,
                   reminder_time TEXT,
-                  last_reminded INTEGER)''')
+                  last_reminded INTEGER)"""
+    )
 
     conn.commit()
     conn.close()
@@ -127,11 +131,13 @@ def add_user(user_id, name, motivation_time=None):
     """
     last_motivation = 0
 
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
-    c.execute("INSERT OR IGNORE INTO users (user_id, name, motivation_time, last_motivation) VALUES (?, ?, ?, ?)",
-              (user_id, name, motivation_time, last_motivation))
+    c.execute(
+        "INSERT OR IGNORE INTO users (user_id, name, motivation_time, last_motivation) VALUES (?, ?, ?, ?)",
+        (user_id, name, motivation_time, last_motivation),
+    )
 
     conn.commit()
     conn.close()
@@ -139,23 +145,25 @@ def add_user(user_id, name, motivation_time=None):
 
 def add_habit(user_id, habit_name):
     """
-        Добавляет новую привычку в базу данных.
+    Добавляет новую привычку в базу данных.
 
-        Args:
-            user_id (int): Уникальный идентификатор пользователя.
-            habit_name (str): Название привычки.
+    Args:
+        user_id (int): Уникальный идентификатор пользователя.
+        habit_name (str): Название привычки.
 
-        Returns:
-            bool: True, если добавление прошло успешно, иначе False.
+    Returns:
+        bool: True, если добавление прошло успешно, иначе False.
     """
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
     created_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     try:
-        c.execute("INSERT INTO habits (user_id, habit_name, created_date) VALUES (?, ?, ?)",
-                  (user_id, habit_name, created_date))
+        c.execute(
+            "INSERT INTO habits (user_id, habit_name, created_date) VALUES (?, ?, ?)",
+            (user_id, habit_name, created_date),
+        )
         conn.commit()
         return True
     except sqlite3.IntegrityError:
@@ -166,24 +174,26 @@ def add_habit(user_id, habit_name):
 
 def add_reminder(user_id, habit_id, new_time):
     """
-        Добавляет время для напоминания про привычку.
+    Добавляет время для напоминания про привычку.
 
-        Args:
-            user_id (int): Уникальный идентификатор пользователя.
-            habit_id (int): Идентефикационный номер привычки.
-            new_time (str): Интервал для напоминания о привычке.
+    Args:
+        user_id (int): Уникальный идентификатор пользователя.
+        habit_id (int): Идентефикационный номер привычки.
+        new_time (str): Интервал для напоминания о привычке.
 
-        Returns:
-            bool: True, если добавление прошло успешно, иначе False.
+    Returns:
+        bool: True, если добавление прошло успешно, иначе False.
     """
     last_reminded = 0
 
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
     try:
-        c.execute("INSERT INTO reminders (user_id, habit_id, reminder_time, last_reminded) VALUES (?, ?, ?, ?)",
-                  (user_id, habit_id, new_time, last_reminded))
+        c.execute(
+            "INSERT INTO reminders (user_id, habit_id, reminder_time, last_reminded) VALUES (?, ?, ?, ?)",
+            (user_id, habit_id, new_time, last_reminded),
+        )
         conn.commit()
         return True
     except sqlite3.IntegrityError:
@@ -194,15 +204,15 @@ def add_reminder(user_id, habit_id, new_time):
 
 def check_reminder(habit_id) -> bool:
     """
-        Получает все привычки пользователя.
+    Получает все привычки пользователя.
 
-        Args:
-            habit_id (int): Уникальный идентификатор привычки.
+    Args:
+        habit_id (int): Уникальный идентификатор привычки.
 
-        Returns:
-            bool: Если напоминание уже есть, то возвращает True, иначе False.
+    Returns:
+        bool: Если напоминание уже есть, то возвращает True, иначе False.
     """
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
     c.execute("SELECT reminder_time FROM reminders WHERE habit_id=?", (habit_id,))
@@ -223,7 +233,7 @@ def get_user_habits(user_id):
     Returns:
         list: Список привычек пользователя в виде кортежей (id, habit_name).
     """
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
     c.execute("SELECT id, habit_name FROM habits WHERE user_id=?", (user_id,))
@@ -235,17 +245,18 @@ def get_user_habits(user_id):
 
 def update_user_reminders(habit_id, new_time):
     """
-        Обновляет данные о времени напоминания конкретной привычки.
+    Обновляет данные о времени напоминания конкретной привычки.
 
-        Args:
-            habit_id (int): Идентефикатор конкретной привычки.
-            new_time (str): Новое интервал для отображения напоминания о привычке.
+    Args:
+        habit_id (int): Идентефикатор конкретной привычки.
+        new_time (str): Новое интервал для отображения напоминания о привычке.
     """
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
-    c.execute("UPDATE reminders SET reminder_time = ? WHERE habit_id=?",
-              (new_time, habit_id))
+    c.execute(
+        "UPDATE reminders SET reminder_time = ? WHERE habit_id=?", (new_time, habit_id)
+    )
 
     conn.commit()
     conn.close()
@@ -253,16 +264,18 @@ def update_user_reminders(habit_id, new_time):
 
 def update_user_motivation(user_id, new_time):
     """
-        Обновляет интервал для рассылки мотивационных сообщений для пользователя.
+    Обновляет интервал для рассылки мотивационных сообщений для пользователя.
 
-        Args:
-            user_id (int): Уникальный идентификатор пользователя.
-            new_time (str): Название привычки.
+    Args:
+        user_id (int): Уникальный идентификатор пользователя.
+        new_time (str): Название привычки.
     """
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
-    c.execute("UPDATE users SET motivation_time = ? WHERE user_id = ?", (new_time, user_id))
+    c.execute(
+        "UPDATE users SET motivation_time = ? WHERE user_id = ?", (new_time, user_id)
+    )
 
     conn.commit()
     conn.close()
@@ -275,7 +288,7 @@ def update_habit_count(habit_id):
     Args:
         habit_id (int): Уникальный идентификатор привычки.
     """
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
     c.execute("UPDATE habits SET count = count + 1 WHERE id=?", (habit_id,))
@@ -293,7 +306,7 @@ def get_stats(user_id):
     Returns:
         list: Список статистики привычек пользователя в виде кортежей (habit_name, count).
     """
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
     c.execute("SELECT habit_name, count FROM habits WHERE user_id=?", (user_id,))
@@ -310,7 +323,7 @@ def delete_habit(habit_id):
     Args:
         habit_id (int): Уникальный идентификатор привычки.
     """
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
     c.execute("DELETE FROM habits WHERE id=?", (habit_id,))
@@ -326,12 +339,14 @@ def update_habit_name(habit_id, new_name):
         habit_id (int): Уникальный идентификатор привычки.
         new_name (str): Новое название привычки.
     """
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
     c.execute("UPDATE habits SET habit_name=? WHERE id=?", (new_name, habit_id))
     conn.commit()
     conn.close()
+
+
 # endregion
 
 # region Menu & Handlers
@@ -353,7 +368,8 @@ def create_menu():
     menu.add(KeyboardButton("Установить мотивационное сообщение 💪🏻"))
     return menu
 
-@bot.message_handler(commands=['start'])
+
+@bot.message_handler(commands=["start"])
 def start(message):
     """
     Обрабатывает команду /start. Приветствует пользователя и отправляет меню для управления привычками.
@@ -367,8 +383,9 @@ def start(message):
         message.chat.id,
         f"👋 Привет {user.first_name}! Я помогу тебе отслеживать привычки!\n\n"
         "Используй кнопки ниже для управления:",
-        reply_markup=create_menu()
+        reply_markup=create_menu(),
     )
+
 
 @bot.message_handler(func=lambda message: True)
 def handle_text(message):
@@ -395,19 +412,16 @@ def handle_text(message):
         schedule_motivation_start(message)
     elif message.text == "Назад":
         bot.send_message(
-            message.chat.id,
-            "Команда отменена.",
-            reply_markup=create_menu()
+            message.chat.id, "Команда отменена.", reply_markup=create_menu()
         )
     else:
         bot.send_message(
-            message.chat.id,
-            "⚠️ Используй кнопки ниже ⬇️",
-            reply_markup=create_menu()
+            message.chat.id, "⚠️ Используй кнопки ниже ⬇️", reply_markup=create_menu()
         )
 
+
 # region Habit Management
-@bot.message_handler(commands=['add_habit'])
+@bot.message_handler(commands=["add_habit"])
 def add_habit_start(message):
     """
     Запрашивает у пользователя название новой привычки.
@@ -418,9 +432,10 @@ def add_habit_start(message):
     msg = bot.send_message(
         message.chat.id,
         "➕ Введите название новой привычки:",
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=ReplyKeyboardRemove(),
     )
     bot.register_next_step_handler(msg, add_habit_end)
+
 
 def add_habit_end(message):
     """
@@ -436,7 +451,7 @@ def add_habit_end(message):
         bot.send_message(
             message.chat.id,
             "❌ Название должно быть не короче 2 символов!",
-            reply_markup=create_menu()
+            reply_markup=create_menu(),
         )
         return
 
@@ -444,16 +459,17 @@ def add_habit_end(message):
         bot.send_message(
             message.chat.id,
             f"✅ Привычка '{habit_name}' успешно добавлена!",
-            reply_markup=create_menu()
+            reply_markup=create_menu(),
         )
     else:
         bot.send_message(
             message.chat.id,
             f"❌ Привычка '{habit_name}' уже существует!",
-            reply_markup=create_menu()
+            reply_markup=create_menu(),
         )
 
-@bot.message_handler(commands=['track_habit'])
+
+@bot.message_handler(commands=["track_habit"])
 def track_habit(message):
     """
     Отображает список привычек пользователя для отметки выполнения.
@@ -470,24 +486,24 @@ def track_habit(message):
         bot.send_message(
             message.chat.id,
             "❌ У вас нет добавленных привычек.",
-            reply_markup=create_menu()
+            reply_markup=create_menu(),
         )
         return
 
     keyboard = InlineKeyboardMarkup()
     for habit in habits:
         habit_id, habit_name = habit
-        keyboard.add(InlineKeyboardButton(
-            text=f"✅ {habit_name}",
-            callback_data=f"track_{habit_id}"
-        ))
+        keyboard.add(
+            InlineKeyboardButton(
+                text=f"✅ {habit_name}", callback_data=f"track_{habit_id}"
+            )
+        )
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
     bot.send_message(
-        message.chat.id,
-        "📅 Выберите привычку для отметки:",
-        reply_markup=keyboard
+        message.chat.id, "📅 Выберите привычку для отметки:", reply_markup=keyboard
     )
+
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("track_"))
 def track_habit_complete(call):
@@ -499,7 +515,7 @@ def track_habit_complete(call):
     """
     habit_id = call.data.split("_")[1]
 
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
     c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
     habit_name = c.fetchone()[0]
@@ -511,15 +527,16 @@ def track_habit_complete(call):
     bot.edit_message_text(
         chat_id=call.message.chat.id,
         message_id=call.message.message_id,
-        text=f"🎉 Привычка '{habit_name}' успешно отмечена!"
+        text=f"🎉 Привычка '{habit_name}' успешно отмечена!",
     )
     bot.send_message(
         call.message.chat.id,
         "🏠 Возвращаемся в главное меню:",
-        reply_markup=create_menu()
+        reply_markup=create_menu(),
     )
 
-@bot.message_handler(commands=['stats'])
+
+@bot.message_handler(commands=["stats"])
 def show_stats(message):
     """
     Отображает статистику выполнения привычек пользователя.
@@ -534,9 +551,7 @@ def show_stats(message):
 
     if not stats:
         bot.send_message(
-            message.chat.id,
-            "📊 Статистика пока пуста.",
-            reply_markup=create_menu()
+            message.chat.id, "📊 Статистика пока пуста.", reply_markup=create_menu()
         )
         return
 
@@ -544,14 +559,11 @@ def show_stats(message):
         [f"• {habit[0]}: {habit[1]} раз" for habit in stats]
     )
 
-    bot.send_message(
-        message.chat.id,
-        message_text,
-        reply_markup=create_menu()
-    )
+    bot.send_message(message.chat.id, message_text, reply_markup=create_menu())
+
 
 # region Delete Habit
-@bot.message_handler(commands=['delete_habit'])
+@bot.message_handler(commands=["delete_habit"])
 def delete_habit_start(message):
     """
     Отображает список привычек пользователя для удаления.
@@ -568,24 +580,24 @@ def delete_habit_start(message):
         bot.send_message(
             message.chat.id,
             "❌ У вас нет добавленных привычек.",
-            reply_markup=create_menu()
+            reply_markup=create_menu(),
         )
         return
 
     keyboard = InlineKeyboardMarkup()
     for habit in habits:
         habit_id, habit_name = habit
-        keyboard.add(InlineKeyboardButton(
-            text=f"❌ {habit_name}",
-            callback_data=f"delete_{habit_id}"
-        ))
+        keyboard.add(
+            InlineKeyboardButton(
+                text=f"❌ {habit_name}", callback_data=f"delete_{habit_id}"
+            )
+        )
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
     bot.send_message(
-        message.chat.id,
-        "🗑️ Выберите привычку для удаления:",
-        reply_markup=keyboard
+        message.chat.id, "🗑️ Выберите привычку для удаления:", reply_markup=keyboard
     )
+
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("delete_"))
 def delete_habit_complete(call):
@@ -597,7 +609,7 @@ def delete_habit_complete(call):
     """
     habit_id = call.data.split("_")[1]
 
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
     c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
     habit_name = c.fetchone()[0]
@@ -609,16 +621,17 @@ def delete_habit_complete(call):
     bot.edit_message_text(
         chat_id=call.message.chat.id,
         message_id=call.message.message_id,
-        text=f"🗑️ Привычка '{habit_name}' успешно удалена!"
+        text=f"🗑️ Привычка '{habit_name}' успешно удалена!",
     )
     bot.send_message(
         call.message.chat.id,
         "🏠 Возвращаемся в главное меню:",
-        reply_markup=create_menu()
+        reply_markup=create_menu(),
     )
 
+
 # region Edit Habit
-@bot.message_handler(commands=['edit_habit'])
+@bot.message_handler(commands=["edit_habit"])
 def edit_habit_start(message):
     """
     Отображает список привычек пользователя для редактирования.
@@ -635,24 +648,26 @@ def edit_habit_start(message):
         bot.send_message(
             message.chat.id,
             "❌ У вас нет добавленных привычек.",
-            reply_markup=create_menu()
+            reply_markup=create_menu(),
         )
         return
 
     keyboard = InlineKeyboardMarkup()
     for habit in habits:
         habit_id, habit_name = habit
-        keyboard.add(InlineKeyboardButton(
-            text=f"✏️ {habit_name}",
-            callback_data=f"edit_{habit_id}"
-        ))
+        keyboard.add(
+            InlineKeyboardButton(
+                text=f"✏️ {habit_name}", callback_data=f"edit_{habit_id}"
+            )
+        )
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
     bot.send_message(
         message.chat.id,
         "✏️ Выберите привычку для редактирования:",
-        reply_markup=keyboard
+        reply_markup=keyboard,
     )
+
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("edit_"))
 def edit_habit_complete(call):
@@ -665,7 +680,7 @@ def edit_habit_complete(call):
     """
     habit_id = call.data.split("_")[1]
 
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
     c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
     habit_name = c.fetchone()[0]
@@ -674,12 +689,12 @@ def edit_habit_complete(call):
     msg = bot.send_message(
         call.message.chat.id,
         f"🔄 Введите новое название для привычки '{habit_name}':",
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=ReplyKeyboardRemove(),
     )
     bot.register_next_step_handler(
-        msg,
-        lambda message, h_id=habit_id: update_habit_end(message, h_id)
+        msg, lambda message, h_id=habit_id: update_habit_end(message, h_id)
     )
+
 
 def update_habit_end(message, habit_id):
     """
@@ -697,7 +712,7 @@ def update_habit_end(message, habit_id):
         bot.send_message(
             message.chat.id,
             "❌ Название должно быть не короче 2 символов!",
-            reply_markup=create_menu()
+            reply_markup=create_menu(),
         )
         return
 
@@ -706,19 +721,20 @@ def update_habit_end(message, habit_id):
     bot.send_message(
         message.chat.id,
         f"✅ Название привычки успешно обновлено на '{new_name}'!",
-        reply_markup=create_menu()
+        reply_markup=create_menu(),
     )
 
+
 # region Reminders
-@bot.message_handler(commands=['schedule_reminder'])
+@bot.message_handler(commands=["schedule_reminder"])
 def schedule_reminder_start(message):
     """
-        Отображает список привычек пользователя для редактирования напоминаний о них.
+    Отображает список привычек пользователя для редактирования напоминаний о них.
 
-        Если у пользователя нет привычек, отправляет сообщение об этом.
+    Если у пользователя нет привычек, отправляет сообщение об этом.
 
-        Args:
-            message (types.Message): Объект сообщения от пользователя.
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
     """
     user_id = message.from_user.id
     habits = get_user_habits(user_id)
@@ -727,97 +743,127 @@ def schedule_reminder_start(message):
         bot.send_message(
             message.chat.id,
             "❌ У вас нет добавленных привычек.",
-            reply_markup=create_menu()
+            reply_markup=create_menu(),
         )
         return
 
     keyboard = InlineKeyboardMarkup(row_width=1)
     for habit in habits:
         habit_id, habit_name = habit
-        keyboard.add(InlineKeyboardButton(
-            text=f"✏️ {habit_name}",
-            callback_data=f"reminder1_{habit_id}"
-        ))
+        keyboard.add(
+            InlineKeyboardButton(
+                text=f"✏️ {habit_name}", callback_data=f"reminder1_{habit_id}"
+            )
+        )
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
     bot.send_message(
         message.chat.id,
         "⏰️ Выберите привычку для установки напоминания:",
-        reply_markup=keyboard
+        reply_markup=keyboard,
     )
+
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("reminder1_"))
 def schedule_reminder_middle(call):
     """
-        Обрабатывает callback-запрос для редактирования напоминания о привычке.
-        Запрашивает у пользователя новый интервал для привычки.
+    Обрабатывает callback-запрос для редактирования напоминания о привычке.
+    Запрашивает у пользователя новый интервал для привычки.
 
-        Args:
-            call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    Args:
+        call (types.CallbackQuery): Объект callback-запроса от пользователя.
     """
-    habit_id = call.data.split('_')[1]
+    habit_id = call.data.split("_")[1]
 
     keyboard = InlineKeyboardMarkup(row_width=1)
-    keyboard.add(InlineKeyboardButton(text="⏰ Каждую минуту", callback_data=f"reminder2_min_{habit_id}"))
-    keyboard.add(InlineKeyboardButton(text="⏰ Раз в час", callback_data=f"reminder2_h_{habit_id}"))
-    keyboard.add(InlineKeyboardButton(text="⏰ Раз в день", callback_data=f"reminder2_d_{habit_id}"))
-    keyboard.add(InlineKeyboardButton(text="⏰ Раз в неделю", callback_data=f"reminder2_w_{habit_id}"))
-    keyboard.add(InlineKeyboardButton(text="⏰ Раз в месяц", callback_data=f"reminder2_m_{habit_id}"))
-    keyboard.add(InlineKeyboardButton(text="⏰ Раз в год", callback_data=f"reminder2_y_{habit_id}"))
+    keyboard.add(
+        InlineKeyboardButton(
+            text="⏰ Каждую минуту", callback_data=f"reminder2_min_{habit_id}"
+        )
+    )
+    keyboard.add(
+        InlineKeyboardButton(
+            text="⏰ Раз в час", callback_data=f"reminder2_h_{habit_id}"
+        )
+    )
+    keyboard.add(
+        InlineKeyboardButton(
+            text="⏰ Раз в день", callback_data=f"reminder2_d_{habit_id}"
+        )
+    )
+    keyboard.add(
+        InlineKeyboardButton(
+            text="⏰ Раз в неделю", callback_data=f"reminder2_w_{habit_id}"
+        )
+    )
+    keyboard.add(
+        InlineKeyboardButton(
+            text="⏰ Раз в месяц", callback_data=f"reminder2_m_{habit_id}"
+        )
+    )
+    keyboard.add(
+        InlineKeyboardButton(
+            text="⏰ Раз в год", callback_data=f"reminder2_y_{habit_id}"
+        )
+    )
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
     bot.send_message(
         call.message.chat.id,
         "⏰️ Выберите интервал, с которым вы хотите получать напоминания:",
-        reply_markup=keyboard
+        reply_markup=keyboard,
     )
+
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("reminder2_"))
 def schedule_reminder_end(call):
     """
-        Обрабатывает callback-запрос для редактирования напоминания о привычке.
-        Подтверждает ответ пользователя и отпраляет запрос в БД на обновление интервала.
+    Обрабатывает callback-запрос для редактирования напоминания о привычке.
+    Подтверждает ответ пользователя и отпраляет запрос в БД на обновление интервала.
 
-        Args:
-            call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    Args:
+        call (types.CallbackQuery): Объект callback-запроса от пользователя.
     """
-    interval, habit_id = call.data.split('_')[1:]
+    interval, habit_id = call.data.split("_")[1:]
 
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
     try:
         # Используем INSERT OR REPLACE для обновления существующей записи
-        c.execute("""INSERT OR REPLACE INTO reminders 
+        c.execute(
+            """INSERT OR REPLACE INTO reminders 
                          (user_id, habit_id, reminder_time, last_reminded)
                          VALUES (?, ?, ?, ?)""",
-                  (call.from_user.id, int(habit_id), interval, 0))
+            (call.from_user.id, int(habit_id), interval, 0),
+        )
         conn.commit()
 
         bot.send_message(
             call.message.chat.id,
             "⏰️ Напоминание успешно обновлено!",
-            reply_markup=create_menu()
+            reply_markup=create_menu(),
         )
     except Exception as e:
         print(f"Error updating reminder: {e}")
         bot.send_message(
             call.message.chat.id,
             "❌ Произошла ошибка при обновлении напоминания",
-            reply_markup=create_menu()
+            reply_markup=create_menu(),
         )
     finally:
         conn.close()
 
+
 def send_reminder(user_id, habit_id):
     """
-        Отправляет напоминания о выполнении привычки пользователю.
+    Отправляет напоминания о выполнении привычки пользователю.
 
-        Args:
-            user_id (int): Уникальный идентефикатор пользователя.
-            habit_id (int): Идентефикатор конкретной привычки.
+    Args:
+        user_id (int): Уникальный идентефикатор пользователя.
+        habit_id (int): Идентефикатор конкретной привычки.
     """
-    conn = sqlite3.connect('habits.db')
+    conn = sqlite3.connect("habits.db")
     c = conn.cursor()
 
     c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
@@ -825,94 +871,112 @@ def send_reminder(user_id, habit_id):
     conn.close()
 
     if habit:
-        bot.send_message(
-            user_id,
-            text=f"⏰ Напоминание, что вам пора {habit[0]}!"
-        )
+        bot.send_message(user_id, text=f"⏰ Напоминание, что вам пора {habit[0]}!")
+
 
 # region Motivation
-@bot.message_handler(commands=['schedule_motivation'])
+@bot.message_handler(commands=["schedule_motivation"])
 def schedule_motivation_start(message):
     """
-        Спрашивает у пользователя, как часто он хочет получать мотивационные сообщения от бота.
+    Спрашивает у пользователя, как часто он хочет получать мотивационные сообщения от бота.
 
-        Args:
-            message (types.Message): Объект сообщения от пользователя.
+    Args:
+        message (types.Message): Объект сообщения от пользователя.
     """
     keyboard = InlineKeyboardMarkup(row_width=1)
 
-    keyboard.add(InlineKeyboardButton(text="💪🏻💪🏻💪🏻 ОЧЕНЬ много (ежеминутно)", callback_data="motiv_min"))
-    keyboard.add(InlineKeyboardButton(text="💪🏻💪🏻 Много (каждый час)", callback_data="motiv_hour"))
-    keyboard.add(InlineKeyboardButton(text="💪🏻 Немного (каджый день)", callback_data="motiv_day"))
-    keyboard.add(InlineKeyboardButton(text=" Мало (каджую неделю)", callback_data="motiv_week"))
-    keyboard.add(InlineKeyboardButton(text="-💪🏻 Совсем мало (каджый месяц)", callback_data="motiv_month"))
+    keyboard.add(
+        InlineKeyboardButton(
+            text="💪🏻💪🏻💪🏻 ОЧЕНЬ много (ежеминутно)", callback_data="motiv_min"
+        )
+    )
+    keyboard.add(
+        InlineKeyboardButton(text="💪🏻💪🏻 Много (каждый час)", callback_data="motiv_hour")
+    )
+    keyboard.add(
+        InlineKeyboardButton(text="💪🏻 Немного (каджый день)", callback_data="motiv_day")
+    )
+    keyboard.add(
+        InlineKeyboardButton(text=" Мало (каджую неделю)", callback_data="motiv_week")
+    )
+    keyboard.add(
+        InlineKeyboardButton(
+            text="-💪🏻 Совсем мало (каджый месяц)", callback_data="motiv_month"
+        )
+    )
 
     bot.send_message(
-        message.chat.id,
-        "💪🏻 Сколько мотивации ты хочешь???",
-        reply_markup=keyboard
+        message.chat.id, "💪🏻 Сколько мотивации ты хочешь???", reply_markup=keyboard
     )
+
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("motiv_"))
 def schedule_motivation_end(call):
     """
-        Обрабатывает callback-запрос для редактирования интервала для мотивационных сообщений.
+    Обрабатывает callback-запрос для редактирования интервала для мотивационных сообщений.
 
-        Args:
-            call (types.CallbackQuery): Объект callback-запроса от пользователя.
+    Args:
+        call (types.CallbackQuery): Объект callback-запроса от пользователя.
     """
     user_id = call.message.chat.id
-    interval = call.data.split('_')[1]
+    interval = call.data.split("_")[1]
 
     update_user_motivation(user_id, interval)
 
     bot.send_message(
         call.message.chat.id,
         "️💪🏻 Новый интервал для мотивации установлен!",
-        reply_markup=create_menu()
+        reply_markup=create_menu(),
     )
+
 
 def send_motivation(user_id):
     """
-        Отправляет мотивационные сообщения пользователю.
+    Отправляет мотивационные сообщения пользователю.
 
-        Args:
-            user_id (int): Уникальный идентефикатор пользователя.
+    Args:
+        user_id (int): Уникальный идентефикатор пользователя.
     """
     quote = random.choice(motivation)
 
-    bot.send_message(
-        user_id,
-        text=quote
-    )
+    bot.send_message(user_id, text=quote)
+
 
 # endregion
 
+
 def run_scheduler():
     """
-        Проверяет, не пора ли оправлять напоминания и мотивацию.
+    Проверяет, не пора ли оправлять напоминания и мотивацию.
     """
     while True:
         try:
-            conn = sqlite3.connect('habits.db')
+            conn = sqlite3.connect("habits.db")
             c = conn.cursor()
 
             # Получаем текущее время один раз для всех проверок
             current_time = time.time()
 
             # Обработка напоминаний
-            c.execute("SELECT user_id, habit_id, reminder_time, last_reminded FROM reminders")
+            c.execute(
+                "SELECT user_id, habit_id, reminder_time, last_reminded FROM reminders"
+            )
             reminders = c.fetchall()
 
             for rem in reminders:
                 user_id, habit_id, interval, last_reminded = rem
                 interval_seconds = intervals.get(interval, 0)
 
-                if interval_seconds > 0 and current_time >= last_reminded + interval_seconds:
+                if (
+                    interval_seconds > 0
+                    and current_time >= last_reminded + interval_seconds
+                ):
                     send_reminder(user_id, habit_id)
                     # Обновляем время последнего напоминания
-                    c.execute("UPDATE reminders SET last_reminded = ? WHERE habit_id = ?",
-                              (int(current_time), habit_id))
+                    c.execute(
+                        "UPDATE reminders SET last_reminded = ? WHERE habit_id = ?",
+                        (int(current_time), habit_id),
+                    )
 
             # Обработка мотивации
             c.execute("SELECT user_id, motivation_time, last_motivation FROM users")
@@ -922,10 +986,16 @@ def run_scheduler():
                 user_id, interval, last_motivation = motiv
                 interval_seconds = intervals.get(interval, 0)
 
-                if interval and interval_seconds > 0 and current_time >= last_motivation + interval_seconds:
+                if (
+                    interval
+                    and interval_seconds > 0
+                    and current_time >= last_motivation + interval_seconds
+                ):
                     send_motivation(user_id)
-                    c.execute("UPDATE users SET last_motivation = ? WHERE user_id = ?",
-                              (int(current_time), user_id))
+                    c.execute(
+                        "UPDATE users SET last_motivation = ? WHERE user_id = ?",
+                        (int(current_time), user_id),
+                    )
 
             conn.commit()
             conn.close()
@@ -948,12 +1018,10 @@ def back_to_menu(call):
     bot.send_message(
         chat_id=call.message.chat.id,
         text="🏠 Возвращаемся в главное меню:",
-        reply_markup=create_menu()
+        reply_markup=create_menu(),
     )
-    bot.delete_message(
-        chat_id=call.message.chat.id,
-        message_id=call.message.message_id
-    )
+    bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+
 
 # endregion
 
