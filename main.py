@@ -108,7 +108,7 @@ def init_db():
     c.execute('''CREATE TABLE IF NOT EXISTS reminders
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id INTEGER,
-                  habit_id INTEGER,
+                  habit_id INTEGER UNIQUE,
                   reminder_time TEXT,
                   last_reminded INTEGER)''')
 
@@ -244,7 +244,8 @@ def update_user_reminders(habit_id, new_time):
     conn = sqlite3.connect('habits.db')
     c = conn.cursor()
 
-    c.execute(f"UPDATE reminders SET reminder_time = {new_time} WHERE habit_id=?", (habit_id,))
+    c.execute("UPDATE reminders SET reminder_time = ? WHERE habit_id=?",
+              (new_time, habit_id))
 
     conn.commit()
     conn.close()
@@ -757,12 +758,12 @@ def schedule_reminder_middle(call):
     habit_id = call.data.split('_')[1]
 
     keyboard = InlineKeyboardMarkup(row_width=1)
+    keyboard.add(InlineKeyboardButton(text="⏰ Каждую минуту", callback_data=f"reminder2_min_{habit_id}"))
     keyboard.add(InlineKeyboardButton(text="⏰ Раз в час", callback_data=f"reminder2_h_{habit_id}"))
     keyboard.add(InlineKeyboardButton(text="⏰ Раз в день", callback_data=f"reminder2_d_{habit_id}"))
     keyboard.add(InlineKeyboardButton(text="⏰ Раз в неделю", callback_data=f"reminder2_w_{habit_id}"))
     keyboard.add(InlineKeyboardButton(text="⏰ Раз в месяц", callback_data=f"reminder2_m_{habit_id}"))
     keyboard.add(InlineKeyboardButton(text="⏰ Раз в год", callback_data=f"reminder2_y_{habit_id}"))
-
     keyboard.add(InlineKeyboardButton("↩️ Назад", callback_data="back_to_menu"))
 
     bot.send_message(
@@ -782,17 +783,31 @@ def schedule_reminder_end(call):
     """
     interval, habit_id = call.data.split('_')[1:]
 
-    if check_reminder(habit_id):
-        update_user_reminders(habit_id, interval)
-    else:
-        user = call.message.chat
-        add_reminder(user.id, habit_id, interval)
+    conn = sqlite3.connect('habits.db')
+    c = conn.cursor()
 
-    bot.send_message(
-        call.message.chat.id,
-        "⏰️ Новый интервал установлен!",
-        reply_markup=create_menu()
-    )
+    try:
+        # Используем INSERT OR REPLACE для обновления существующей записи
+        c.execute("""INSERT OR REPLACE INTO reminders 
+                         (user_id, habit_id, reminder_time, last_reminded)
+                         VALUES (?, ?, ?, ?)""",
+                  (call.from_user.id, int(habit_id), interval, 0))
+        conn.commit()
+
+        bot.send_message(
+            call.message.chat.id,
+            "⏰️ Напоминание успешно обновлено!",
+            reply_markup=create_menu()
+        )
+    except Exception as e:
+        print(f"Error updating reminder: {e}")
+        bot.send_message(
+            call.message.chat.id,
+            "❌ Произошла ошибка при обновлении напоминания",
+            reply_markup=create_menu()
+        )
+    finally:
+        conn.close()
 
 def send_reminder(user_id, habit_id):
     """
@@ -805,15 +820,15 @@ def send_reminder(user_id, habit_id):
     conn = sqlite3.connect('habits.db')
     c = conn.cursor()
 
-    c.execute("SELECT habit_name FROM habits WHERE habit_id=?", (habit_id,))
-    habit_name = c.fetchone()
-
+    c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
+    habit = c.fetchone()
     conn.close()
 
-    bot.send_message(
-        user_id,
-        text=f"⏰ Напоминание, что вам пора {habit_name}!"
-    )
+    if habit:
+        bot.send_message(
+            user_id,
+            text=f"⏰ Напоминание, что вам пора {habit[0]}!"
+        )
 
 # region Motivation
 @bot.message_handler(commands=['schedule_motivation'])
@@ -877,34 +892,48 @@ def run_scheduler():
     """
         Проверяет, не пора ли оправлять напоминания и мотивацию.
     """
-    fl = True
-
     while True:
-        conn = sqlite3.connect('habits.db')
-        c = conn.cursor()
+        try:
+            conn = sqlite3.connect('habits.db')
+            c = conn.cursor()
 
-        c.execute("SELECT user_id, habit_id, reminder_time, last_reminded FROM reminders")
-        reminders = c.fetchall()
-        c.execute("SELECT user_id, motivation_time, last_motivation FROM users")
-        motivations = c.fetchall()
+            # Получаем текущее время один раз для всех проверок
+            current_time = time.time()
 
-        for rem in reminders:
-            if rem[3] + intervals[rem[2]] >= time.time():
-                send_reminder(rem[0], rem[1])
-                c.execute(f"UPDATE reminders SET last_reminded = {time.time()} WHERE habit_id=?",
-                          (rem[1],))
+            # Обработка напоминаний
+            c.execute("SELECT user_id, habit_id, reminder_time, last_reminded FROM reminders")
+            reminders = c.fetchall()
 
-        for motiv in motivations:
-            if motiv[2] + intervals[motiv[1]] >= time.time():
-                send_motivation(motiv[0])
-                c.execute(f"UPDATE users SET last_motivation = {time.time()} WHERE user_id=?",
-                          (motiv[0],))
+            for rem in reminders:
+                user_id, habit_id, interval, last_reminded = rem
+                interval_seconds = intervals.get(interval, 0)
 
-        conn.commit()
-        conn.close()
+                if interval_seconds > 0 and current_time >= last_reminded + interval_seconds:
+                    send_reminder(user_id, habit_id)
+                    # Обновляем время последнего напоминания
+                    c.execute("UPDATE reminders SET last_reminded = ? WHERE habit_id = ?",
+                              (int(current_time), habit_id))
 
+            # Обработка мотивации
+            c.execute("SELECT user_id, motivation_time, last_motivation FROM users")
+            motivations = c.fetchall()
 
+            for motiv in motivations:
+                user_id, interval, last_motivation = motiv
+                interval_seconds = intervals.get(interval, 0)
 
+                if interval and interval_seconds > 0 and current_time >= last_motivation + interval_seconds:
+                    send_motivation(user_id)
+                    c.execute("UPDATE users SET last_motivation = ? WHERE user_id = ?",
+                              (int(current_time), user_id))
+
+            conn.commit()
+            conn.close()
+            time.sleep(10)  # Проверяем каждые 10 секунд вместо 1
+
+        except Exception as e:
+            print(f"Scheduler error: {e}")
+            time.sleep(60)
 
 
 # region Back to Menu
