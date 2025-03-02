@@ -261,7 +261,7 @@ def update_user_motivation(user_id, new_time):
     conn = sqlite3.connect('habits.db')
     c = conn.cursor()
 
-    c.execute(f"UPDATE users SET motivation_time = {new_time} WHERE user_id=?", (user_id,))
+    c.execute("UPDATE users SET motivation_time = ? WHERE user_id = ?", (new_time, user_id))
 
     conn.commit()
     conn.close()
@@ -931,4 +931,10 @@ def back_to_menu(call):
 if __name__ == "__main__":
     init_db()
     print("🚀 Бот успешно запущен!")
+
+    # Запуск планировщика в отдельном потоке
+    scheduler_thread = threading.Thread(target=run_scheduler)
+    scheduler_thread.daemon = True  # Установите поток как демон, чтобы он завершался при завершении основного потока
+    scheduler_thread.start()
+
     bot.polling(none_stop=True)
