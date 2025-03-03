@@ -1,3 +1,4 @@
+import os
 import telebot
 import sqlite3
 from datetime import datetime
@@ -12,7 +13,7 @@ from telebot.types import (
     ReplyKeyboardRemove,
 )
 
-bot = telebot.TeleBot("8094395413:AAGlIanHK3Ji99-N90Nkinvqk4ikRJlkeQg")
+bot = telebot.TeleBot(os.environ.get("TELEGRAM_TOKEN"))
 
 motivation = [
     "Верь в себя, и мир поверит в тебя." "Верь в себя, и мир поверит в тебя.",
