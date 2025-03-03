@@ -89,7 +89,7 @@ def init_db():
 
     Создает таблицы 'users', 'habits' и 'reminders', если они еще не существуют.
     """
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     c.execute(
@@ -134,7 +134,7 @@ def add_user(user_id, name, motivation_time=None):
     """
     last_motivation = 0
 
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     c.execute(
@@ -157,7 +157,7 @@ def add_habit(user_id, habit_name):
     Returns:
         bool: True, если добавление прошло успешно, иначе False.
     """
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     created_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -189,7 +189,7 @@ def add_reminder(user_id, habit_id, new_time):
     """
     last_reminded = 0
 
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     try:
@@ -215,7 +215,7 @@ def check_reminder(habit_id) -> bool:
     Returns:
         bool: Если напоминание уже есть, то возвращает True, иначе False.
     """
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     c.execute("SELECT reminder_time FROM reminders WHERE habit_id=?", (habit_id,))
@@ -236,7 +236,7 @@ def get_user_habits(user_id):
     Returns:
         list: Список привычек пользователя в виде кортежей (id, habit_name).
     """
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     c.execute("SELECT id, habit_name FROM habits WHERE user_id=?", (user_id,))
@@ -254,7 +254,7 @@ def update_user_reminders(habit_id, new_time):
         habit_id (int): Идентификатор конкретной привычки.
         new_time (str): Новое интервал для отображения напоминания о привычке.
     """
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     c.execute(
@@ -273,7 +273,7 @@ def update_user_motivation(user_id, new_time):
         user_id (int): Уникальный идентификатор пользователя.
         new_time (str): Название привычки.
     """
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     c.execute(
@@ -291,7 +291,7 @@ def update_habit_count(habit_id):
     Args:
         habit_id (int): Уникальный идентификатор привычки.
     """
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     c.execute("UPDATE habits SET count = count + 1 WHERE id=?", (habit_id,))
@@ -309,7 +309,7 @@ def get_stats(user_id):
     Returns:
         list: Список статистики привычек пользователя в виде кортежей (habit_name, count).
     """
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     c.execute("SELECT habit_name, count FROM habits WHERE user_id=?", (user_id,))
@@ -326,7 +326,7 @@ def delete_habit(habit_id):
     Args:
         habit_id (int): Уникальный идентификатор привычки.
     """
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     c.execute("DELETE FROM habits WHERE id=?", (habit_id,))
@@ -342,7 +342,7 @@ def update_habit_name(habit_id, new_name):
         habit_id (int): Уникальный идентификатор привычки.
         new_name (str): Новое название привычки.
     """
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     c.execute("UPDATE habits SET habit_name=? WHERE id=?", (new_name, habit_id))
@@ -518,7 +518,7 @@ def track_habit_complete(call):
     """
     habit_id = call.data.split("_")[1]
 
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
     habit_name = c.fetchone()[0]
@@ -612,7 +612,7 @@ def delete_habit_complete(call):
     """
     habit_id = call.data.split("_")[1]
 
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
     habit_name = c.fetchone()[0]
@@ -683,7 +683,7 @@ def edit_habit_complete(call):
     """
     habit_id = call.data.split("_")[1]
 
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
     habit_name = c.fetchone()[0]
@@ -829,7 +829,7 @@ def schedule_reminder_end(call):
     """
     interval, habit_id = call.data.split("_")[1:]
 
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     try:
@@ -866,7 +866,7 @@ def send_reminder(user_id, habit_id):
         user_id (int): Уникальный идентификатор пользователя.
         habit_id (int): Идентификатор конкретной привычки.
     """
-    conn = sqlite3.connect("habits.db")
+    conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
 
     c.execute("SELECT habit_name FROM habits WHERE id=?", (habit_id,))
@@ -954,7 +954,7 @@ def run_scheduler():
     """
     while True:
         try:
-            conn = sqlite3.connect("habits.db")
+            conn = sqlite3.connect(DB_FILE)
             c = conn.cursor()
 
             # Получаем текущее время один раз для всех проверок
@@ -1032,9 +1032,8 @@ if __name__ == "__main__":
     init_db()
     print("🚀 Бот успешно запущен!")
 
-    # Запуск планировщика в отдельном потоке
     scheduler_thread = threading.Thread(target=run_scheduler)
-    scheduler_thread.daemon = True  # Установите поток как демон, чтобы он завершался при завершении основного потока
+    scheduler_thread.daemon = True
     scheduler_thread.start()
 
     bot.polling(none_stop=True)
