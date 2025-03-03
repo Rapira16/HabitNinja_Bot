@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  habit-bot:
+    build: .
+    volumes:
+      - ./data:/app/data  # Сохраняем БД на хост-машине
+    environment:
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+    restart: unless-stopped
