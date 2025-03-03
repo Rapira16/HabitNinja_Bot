@@ -833,7 +833,6 @@ def schedule_reminder_end(call):
     c = conn.cursor()
 
     try:
-        # Используем INSERT OR REPLACE для обновления существующей записи
         c.execute(
             """INSERT OR REPLACE INTO reminders 
                          (user_id, habit_id, reminder_time, last_reminded)
@@ -957,10 +956,8 @@ def run_scheduler():
             conn = sqlite3.connect(DB_FILE)
             c = conn.cursor()
 
-            # Получаем текущее время один раз для всех проверок
             current_time = time.time()
 
-            # Обработка напоминаний
             c.execute(
                 "SELECT user_id, habit_id, reminder_time, last_reminded FROM reminders"
             )
@@ -975,13 +972,11 @@ def run_scheduler():
                     and current_time >= last_reminded + interval_seconds
                 ):
                     send_reminder(user_id, habit_id)
-                    # Обновляем время последнего напоминания
                     c.execute(
                         "UPDATE reminders SET last_reminded = ? WHERE habit_id = ?",
                         (int(current_time), habit_id),
                     )
 
-            # Обработка мотивации
             c.execute("SELECT user_id, motivation_time, last_motivation FROM users")
             motivations = c.fetchall()
 
@@ -1002,7 +997,7 @@ def run_scheduler():
 
             conn.commit()
             conn.close()
-            time.sleep(10)  # Проверяем каждые 10 секунд вместо 1
+            time.sleep(10)
 
         except Exception as e:
             print(f"Scheduler error: {e}")
