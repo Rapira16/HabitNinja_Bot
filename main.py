@@ -15,6 +15,8 @@ from telebot.types import (
 
 bot = telebot.TeleBot(os.environ.get("TELEGRAM_TOKEN"))
 
+DB_FILE = os.environ.get("DB_FILE", "habits.db")
+
 motivation = [
     "Верь в себя, и мир поверит в тебя." "Верь в себя, и мир поверит в тебя.",
     "Каждый день — новый шанс изменить свою жизнь.",
